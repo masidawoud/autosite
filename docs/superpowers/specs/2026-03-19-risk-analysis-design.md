@@ -54,6 +54,8 @@ AutoSite is a Node.js pipeline that generates and deploys dental practice websit
 
 When Option C (dashboard) is built, `client_ready` becomes the primary filter for the client-facing view.
 
+If a prospect with `client_ready=yes` is reset to `pending` and re-run (e.g., to regenerate content), the pipeline must not touch the `client_ready` column. The operator must manually re-evaluate and re-set it after reviewing the new content.
+
 ---
 
 ### 2. Generated Content Validation
@@ -69,9 +71,9 @@ Validation failed: phone '020 123 4567' not found in generated content
 
 **Structure check:** Verify all top-level keys are present and non-empty: `meta`, `business`, `hero`, `services`, `team`, `reviews`, `hours`, `vergoeding`, `contact`, `footer`. Guards against truncated LLM output that parses as valid JSON but is missing whole sections.
 
-**Scope:** Does not apply to `--dummy` mode (dummy content is built from CSV directly and is always structurally valid).
+**Scope:** Does not apply to `--dummy` mode (dummy content is built from CSV directly and is always structurally valid). This exemption applies whenever `--dummy` is present, including `--dry-run --dummy`. A `--dry-run` run without `--dummy` goes through full validation.
 
-On validation failure: the prospect is marked `failed` in the CSV; the pipeline logs the error and continues to the next prospect.
+On validation failure: in a normal run, the prospect is marked `failed` in the CSV and the pipeline continues to the next prospect. In `--dry-run` mode, no CSV writes occur under any circumstance — failures are reported to the terminal only, and the prospect remains `pending`.
 
 ---
 
@@ -89,13 +91,15 @@ On validation failure: the prospect is marked `failed` in the CSV; the pipeline 
 
 The prospect status is still written as `completed` on health check failure — a network blip should not trigger a full re-run. The `health` column gives the operator immediate visibility into which sites need manual attention.
 
+**Note on Cloudflare propagation:** The health check runs immediately after Wrangler exits, but Cloudflare Pages deployments may not be globally propagated within that window. A `timeout` or `error:5xx` result may reflect propagation lag rather than a real problem. The `health` value reflects the state at check time only, not guaranteed long-term availability. Operators should allow a few minutes before acting on a non-`ok` result.
+
 ---
 
 ### 4. Pipeline Run Log
 
 **Problem:** No record of what ran, when, and what the output was. Debugging relies entirely on terminal scrollback.
 
-**Solution:** After each full pipeline run, append a structured Markdown entry to `pipeline-runs.log` at the repo root. The file is append-only — never overwritten. Commit it to git for a durable audit trail.
+**Solution:** After each full pipeline run, append a structured Markdown entry to `pipeline-runs.log` at the repo root. The file is append-only — never overwritten. It is tracked by git and committed manually by the operator (not auto-committed by the pipeline) for a durable audit trail.
 
 Each entry contains:
 - Timestamp of the run
@@ -112,6 +116,8 @@ Format (Markdown):
 | Tandarts Y (Utrecht) | failed | | | Validation failed: phone not found |
 ```
 
+The Health cell is left empty for rows where deployment was never attempted (e.g., failed validation). The three `health` CSV values (`ok`, `error:{code}`, `timeout`) only apply to rows where deployment succeeded.
+
 ---
 
 ### 5. `--dry-run` Mode
@@ -120,7 +126,7 @@ Format (Markdown):
 
 **Solution:** A `--dry-run` flag that runs the full pipeline (CSV parsing, Groq generation, theme building, template clone, Astro build) but skips `deploy()`. The CSV is **not written back**, so the prospect remains `pending` and can be re-run.
 
-Terminal output makes the dry run explicit:
+Terminal output makes the dry run explicit (the pipeline already uses emoji — `🦷`, `✓`, `⟳`, `⚠`, `✗` — so the dry-run output follows the same convention):
 ```
 🦷  AutoSite Pipeline (dry-run)
 ── Tandartspraktijk X (Amsterdam) [warm-editorial] ──
@@ -130,6 +136,8 @@ Terminal output makes the dry run explicit:
     ⚠ Dry run — skipping deploy. Built files at: builds/1/dist/
 ```
 
+Dry runs are still logged to `pipeline-runs.log` with `dry-run` noted in the flags column and no URL or health value.
+
 Can be combined with `--dummy` for zero-cost, zero-deploy testing of the full build flow.
 
 ---
@@ -138,7 +146,7 @@ Can be combined with `--dummy` for zero-cost, zero-deploy testing of the full bu
 
 **Problem:** Losing or corrupting `prospects.csv` loses all build state and deployed URLs. There is also an existing build dir naming inconsistency (`001`–`005` legacy dirs vs plain integer dirs going forward).
 
-**Backup solution:** At the end of every successful pipeline run, copy `prospects.csv` to `backups/prospects-YYYY-MM-DD-HH-mm.csv`. The `backups/` directory is gitignored (machine-local safety nets). The pipeline automatically deletes backups older than the 10 most recent.
+**Backup solution:** At the end of every successful pipeline run, copy `prospects.csv` to `backups/prospects-YYYY-MM-DD-HH-mm.csv`. The `backups/` directory is gitignored (machine-local safety nets). After writing the new backup, delete the oldest backups so that no more than 10 remain.
 
 **Build dir naming convention:** The `id` column in `prospects.csv` is used as-is as the build directory name. The existing `001`–`005` dirs are legacy — do not renumber them. All new prospects use plain integers (e.g., `6`, `7`, ...) continuing from the current highest numeric ID. Document this in CLAUDE.md.
 
