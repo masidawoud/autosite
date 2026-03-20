@@ -16,7 +16,7 @@ A self-serve CMS for dental practice clients. Clients log in at `directus.yourdo
 ## System architecture
 
 ```
-Directus (Render Phase 1 — free tier, Railway ~$10/mo production)
+Directus (Fly.io Phase 1 ~$5-6/mo, Railway ~$10/mo production)
   ├── PostgreSQL DB
   ├── Admin UI at directus.yourdomain.com/admin
   ├── REST API (content read/write for pipeline)
@@ -160,11 +160,12 @@ GitHub Action (deploy.yml) receives client_id input:
 
 ## Hosting
 
-### Phase 1 — Render (free tier)
-- Free web service for Directus — spins down after 15 min inactivity (acceptable for a trial/PoC)
-- Free PostgreSQL — available for 90 days, sufficient for Phase 1 validation
-- No credit card required
-- Cost: $0
+### Phase 1 — Fly.io (~$5–6/mo)
+- Directus app: shared-cpu-1x, 512MB RAM (~$3.32/mo)
+- PostgreSQL app: shared-cpu-1x, 256MB RAM (~$1.94/mo)
+- Persistent volume: 1GB (~$0.15/mo)
+- No spin-down — machines stay running
+- Credit card required
 
 ### Production — Railway (~$10/mo)
 - Directus service + PostgreSQL service
@@ -175,10 +176,10 @@ GitHub Action (deploy.yml) receives client_id input:
 
 ## Phasing
 
-### Phase 1 — Proof of concept *(free exit point)*
-Directus on Render (free tier). `site_configs` collection only. Client role with row-level permissions. One demo client end-to-end: Directus save → GitHub Action → Cloudflare Pages deploy. Manual onboarding.
+### Phase 1 — Proof of concept *(low-cost exit point, ~$5–6/mo)*
+Directus on Fly.io. `site_configs` collection only. Client role with row-level permissions. One demo client end-to-end: Directus save → GitHub Action → Cloudflare Pages deploy. Manual onboarding.
 
-**Reversibility:** delete Render app, delete GitHub Action workflow. Zero impact on existing pipeline or production sites.
+**Reversibility:** delete Fly.io app, delete GitHub Action workflow. Zero impact on existing pipeline or production sites.
 
 ### Phase 2 — Multi-page + blocks
 `pages` collection + M2A blocks. Block collections for all 11 existing section types + `block_text` (WYSIWYG). `[...slug].astro` dynamic routing in dental-template. Clients can create pages and manage section order.
