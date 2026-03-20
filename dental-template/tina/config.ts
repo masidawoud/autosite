@@ -28,8 +28,6 @@ export default defineConfig({
         ui: {
           // site.json is a fixed document — clients cannot create or delete it
           allowedActions: { create: false, delete: false },
-          // Route editor to the homepage so preview shows the result
-          router: () => "/",
         },
         fields: [
           // ── meta (hidden — not editable in Phase 1) ─────────────────────
