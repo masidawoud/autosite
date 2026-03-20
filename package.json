@@ -1,0 +1,11 @@
+{
+  "name": "autosite-pipeline",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "node build-sites.js"
+  },
+  "dependencies": {
+    "groq-sdk": "^0.9.0"
+  }
+}

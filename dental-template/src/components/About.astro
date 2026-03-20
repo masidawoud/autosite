@@ -1,0 +1,110 @@
+---
+interface TeamMember {
+  name: string;
+  role: string;
+  bio: string;
+  image_url: string;
+}
+
+interface Props {
+  data: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    members: TeamMember[];
+  };
+}
+const { data } = Astro.props;
+---
+
+<section class="about section" id="team">
+  <div class="container">
+    <div class="about__header">
+      <span class="eyebrow">{data.eyebrow}</span>
+      <h2>{data.title}</h2>
+      <p>{data.subtitle}</p>
+    </div>
+
+    <div class="team-grid">
+      {data.members.map(member => (
+        <div class="team-card">
+          <div class="team-card__image-wrapper">
+            <img
+              src={member.image_url}
+              alt={member.name}
+              class="team-card__img"
+              loading="lazy"
+            />
+          </div>
+          <div class="team-card__info">
+            <span class="team-card__role">{member.role}</span>
+            <h3 class="team-card__name">{member.name}</h3>
+            <p class="team-card__bio">{member.bio}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .about__header {
+    text-align: center;
+    margin-bottom: clamp(3rem, 6vw, 5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .about__header p { max-width: 48ch; text-align: center; }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .team-card { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .team-card__image-wrapper {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: var(--color-bg-alt);
+  }
+
+  .team-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .team-card:hover .team-card__img { transform: scale(1.04); }
+
+  .team-card__info { display: flex; flex-direction: column; gap: 0.3rem; }
+
+  .team-card__role {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .team-card__name { font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.2; }
+
+  .team-card__bio { font-size: 0.9375rem; line-height: 1.65; max-width: none; margin-top: 0.25rem; }
+
+  @media (max-width: 900px) {
+    .team-grid { grid-template-columns: repeat(2, 1fr); }
+    .team-grid > :last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      max-width: 420px;
+      margin-inline: auto;
+    }
+  }
+  @media (max-width: 560px) {
+    .team-grid { grid-template-columns: 1fr; }
+    .team-grid > :last-child:nth-child(odd) { grid-column: auto; max-width: none; }
+  }
+</style>

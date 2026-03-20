@@ -1,0 +1,180 @@
+---
+interface Props {
+  data: {
+    eyebrow: string;
+    headline: string;
+    description: string;
+    cta_primary: string;
+    cta_secondary: string;
+    image_url: string;
+  };
+  business: {
+    phone: string;
+    google_reviews_score: string;
+    google_reviews_count: number;
+    google_reviews_url: string;
+  };
+}
+const { data, business } = Astro.props;
+const phoneHref = business.phone.replace(/\s/g, '');
+---
+
+<section class="hero" id="home">
+  <div class="container hero__grid">
+
+    <div class="hero__image-col">
+      <div class="hero__image-wrapper">
+        <img
+          src={data.image_url}
+          alt="Tandartspraktijk – praktijkfoto"
+          class="hero__img"
+          width="720"
+          height="860"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <div class="hero__badge">
+          <span class="stars" aria-label={`${business.google_reviews_score} sterren`}>★★★★★</span>
+          <div class="hero__badge-info">
+            <strong>{business.google_reviews_score}</strong>
+            <span>op Google Reviews</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__text-col">
+      <span class="eyebrow">{data.eyebrow}</span>
+      <h1 class="hero__title">{data.headline}</h1>
+      <div class="hero__rating">
+        <span class="stars" aria-label={`${business.google_reviews_score} van de 5 sterren`}>★★★★★</span>
+        <span class="hero__rating-text">
+          {business.google_reviews_score} &middot;
+          <a href={business.google_reviews_url}>{business.google_reviews_count} Google Reviews</a>
+        </span>
+      </div>
+      <p class="hero__desc">{data.description}</p>
+      <div class="hero__actions">
+        <a href="#contact" class="btn btn-primary">{data.cta_primary}</a>
+        <a href={`tel:${phoneHref}`} class="btn btn-outline">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.1a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          {data.cta_secondary}: {business.phone}
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: calc(5.5rem + 70px);
+    padding-bottom: clamp(5rem, 10vw, 9rem);
+    overflow: hidden;
+  }
+
+  .hero__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2.5rem, 5vw, 5.5rem);
+    align-items: center;
+  }
+
+  .hero__image-wrapper {
+    position: relative;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    aspect-ratio: 5 / 6;
+    background: var(--color-bg-alt);
+  }
+
+  .hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hero__badge {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: rgba(250, 247, 242, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-md);
+    padding: 0.875rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    box-shadow: 0 12px 40px rgba(28,25,23,0.12);
+  }
+
+  .hero__badge-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    line-height: 1;
+  }
+  .hero__badge-info strong {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .hero__badge-info span {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .hero__text-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .hero__title { margin-top: 0.5rem; }
+
+  .hero__rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    margin-top: -0.25rem;
+  }
+  .hero__rating a {
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .hero__rating a:hover { color: var(--color-text); }
+
+  .hero__desc {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    max-width: 44ch;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.875rem;
+    margin-top: 0.375rem;
+  }
+
+  @media (max-width: 900px) {
+    .hero { padding-top: calc(3.5rem + 70px); }
+    .hero__grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+    .hero__image-wrapper {
+      aspect-ratio: 4 / 3;
+      border-radius: var(--radius-lg);
+    }
+    .hero__desc { max-width: none; }
+  }
+</style>

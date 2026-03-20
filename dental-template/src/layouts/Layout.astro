@@ -1,0 +1,193 @@
+---
+import theme from '../data/theme.json';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = 'Professionele tandheelkundige zorg in uw buurt.' } = Astro.props;
+
+// Build Google Fonts URL from theme
+const fontsUrl = `https://fonts.googleapis.com/css2?family=${theme.fonts.display_url}&family=${theme.fonts.body_url}&display=swap`;
+
+// Build CSS custom properties from theme
+const cssVars = `
+  --font-display: '${theme.fonts.display_family}', ${theme.fonts.display_fallback};
+  --font-body: '${theme.fonts.body_family}', ${theme.fonts.body_fallback};
+  --color-accent:       ${theme.colors.accent};
+  --color-accent-hover: ${theme.colors.accent_hover};
+  --color-accent-light: ${theme.colors.accent_light};
+  --color-bg:           ${theme.colors.bg};
+  --color-bg-alt:       ${theme.colors.bg_alt};
+  --color-bg-dark:      ${theme.colors.bg_dark};
+  --color-text:         ${theme.colors.text};
+  --color-text-muted:   ${theme.colors.text_muted};
+  --color-text-light:   ${theme.colors.text_light};
+  --color-border:       ${theme.colors.border};
+  --color-star:         ${theme.colors.star};
+  --radius-sm:          ${theme.radius.sm};
+  --radius-md:          ${theme.radius.md};
+  --radius-lg:          ${theme.radius.lg};
+  --radius-xl:          ${theme.radius.xl};
+`.trim();
+---
+
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href={fontsUrl} rel="stylesheet" />
+    <!-- Theme tokens injected from theme.json -->
+    <Fragment set:html={`<style>:root{${cssVars}}</style>`} />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  /* ===========================
+     Reset
+  =========================== */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  img, video { display: block; max-width: 100%; height: auto; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ===========================
+     Typography
+  =========================== */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    color: var(--color-text);
+  }
+
+  h1 { font-size: clamp(2.75rem, 5.5vw, 4.75rem); }
+  h2 { font-size: clamp(2.125rem, 4vw, 3.75rem); }
+  h3 { font-size: clamp(1.375rem, 2.5vw, 1.875rem); }
+  h4 { font-size: 1.125rem; }
+
+  p {
+    font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 60ch;
+  }
+
+  /* ===========================
+     Layout
+  =========================== */
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding-inline: clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .container--narrow {
+    max-width: 860px;
+    margin: 0 auto;
+    padding-inline: clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .section { padding-block: clamp(5rem, 10vw, 9rem); }
+
+  /* ===========================
+     Buttons
+  =========================== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.875rem;
+    border-radius: var(--radius-pill, 999px);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    border: 1.5px solid transparent;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  .btn-primary {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+  }
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+  .btn-outline:hover {
+    background: var(--color-bg-alt);
+    border-color: var(--color-text-muted);
+  }
+
+  /* ===========================
+     Eyebrow
+  =========================== */
+  .eyebrow {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  /* ===========================
+     Stars
+  =========================== */
+  .stars {
+    display: inline-flex;
+    gap: 1px;
+    color: var(--color-star);
+  }
+
+  /* ===========================
+     Divider
+  =========================== */
+  .divider {
+    width: 2.5rem;
+    height: 2px;
+    background: var(--color-border);
+    border: none;
+    margin-block: 1.5rem;
+  }
+</style>

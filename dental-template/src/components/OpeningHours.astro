@@ -1,0 +1,144 @@
+---
+interface HourRow {
+  day: string;
+  time: string;
+  open: boolean;
+}
+
+interface Props {
+  data: { items: HourRow[] };
+  business: {
+    phone: string;
+    email: string;
+    address: string;
+    postal_code: string;
+    city: string;
+  };
+}
+const { data, business } = Astro.props;
+const phoneHref = business.phone.replace(/\s/g, '');
+---
+
+<section class="hours section" id="openingstijden">
+  <div class="container hours__grid">
+
+    <div class="hours__info">
+      <span class="eyebrow hours__eyebrow">Wanneer wij er voor u zijn</span>
+      <h2 class="hours__title">Openingstijden</h2>
+      <p class="hours__desc">
+        Kom gerust langs tijdens onze openingstijden.
+        Bij spoed zijn wij ook telefonisch bereikbaar.
+      </p>
+
+      <div class="hours__contacts">
+        <a href={`tel:${phoneHref}`} class="hours__contact">
+          <span class="hours__contact-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.1a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </span>
+          {business.phone}
+        </a>
+        <a href={`mailto:${business.email}`} class="hours__contact">
+          <span class="hours__contact-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </span>
+          {business.email}
+        </a>
+        <div class="hours__contact">
+          <span class="hours__contact-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </span>
+          {business.address}, {business.postal_code} {business.city}
+        </div>
+      </div>
+    </div>
+
+    <div class="hours__table-wrapper">
+      <table class="hours__table">
+        <tbody>
+          {data.items.map(row => (
+            <tr class={!row.open ? 'is-closed' : ''}>
+              <td class="hours__day">{row.day}</td>
+              <td class="hours__time">{row.time}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .hours { background: var(--color-bg-dark); }
+  .hours__eyebrow { color: rgba(250, 247, 242, 0.45); }
+  .hours__title { color: var(--color-text-light); margin-top: 0.5rem; }
+  .hours__desc { color: rgba(250, 247, 242, 0.6); max-width: 38ch; }
+
+  .hours__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(3rem, 6vw, 7rem);
+    align-items: start;
+  }
+
+  .hours__info { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .hours__contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    margin-top: 0.5rem;
+  }
+
+  .hours__contact {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9375rem;
+    color: rgba(250, 247, 242, 0.75);
+    transition: color 0.15s;
+  }
+  a.hours__contact:hover { color: white; }
+
+  .hours__contact-icon {
+    width: 2rem;
+    height: 2rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--color-accent);
+  }
+
+  .hours__table-wrapper {
+    background: rgba(255,255,255,0.05);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .hours__table { width: 100%; border-collapse: collapse; }
+
+  .hours__table tr { border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .hours__table tr:last-child { border-bottom: none; }
+
+  .hours__table td { padding: 1.0625rem 1.5rem; font-size: 0.9375rem; }
+
+  .hours__day { color: rgba(250, 247, 242, 0.9); font-weight: 500; }
+  .hours__time { text-align: right; color: rgba(250, 247, 242, 0.6); font-variant-numeric: tabular-nums; }
+
+  .is-closed .hours__day,
+  .is-closed .hours__time { color: rgba(250, 247, 242, 0.3); }
+
+  @media (max-width: 768px) { .hours__grid { grid-template-columns: 1fr; } }
+</style>

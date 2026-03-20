@@ -1,0 +1,31 @@
+---
+import site from '../data/site.json';
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Quote from '../components/Quote.astro';
+import Features from '../components/Features.astro';
+import Services from '../components/Services.astro';
+import About from '../components/About.astro';
+import Reviews from '../components/Reviews.astro';
+import OpeningHours from '../components/OpeningHours.astro';
+import Vergoeding from '../components/Vergoeding.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title={site.meta.title} description={site.meta.description}>
+  <Nav business={site.business} />
+  <main>
+    <Hero data={site.hero} business={site.business} />
+    <Quote data={site.quote} />
+    <Features data={site.features} />
+    <Services data={site.services} />
+    <About data={site.team} />
+    <Reviews data={site.reviews} />
+    <OpeningHours data={site.hours} business={site.business} />
+    <Vergoeding data={site.vergoeding} />
+    <Contact data={site.contact} business={site.business} />
+  </main>
+  <Footer business={site.business} footer={site.footer} />
+</Layout>

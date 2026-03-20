@@ -1,0 +1,136 @@
+---
+interface Props {
+  business: {
+    name: string;
+    phone: string;
+    email: string;
+  };
+  footer: {
+    tagline: string;
+  };
+}
+const { business, footer } = Astro.props;
+const phoneHref = business.phone.replace(/\s/g, '');
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+
+    <div class="footer__brand">
+      <a href="/" class="footer__logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2C9.5 2 7.5 3.5 6.5 5.5C5.5 3.5 3.5 2 3 2C2 2 1 3 1 4.5C1 7 2.5 8.5 3.5 10C4.5 11.5 5 13 5 15C5 17 6 19 7 20C7.5 20.5 8 21 8.5 21C9 21 9 20 9 19C9 18 9 17 9.5 16C10 15 11 14.5 12 14.5C13 14.5 14 15 14.5 16C15 17 15 18 15 19C15 20 15 21 15.5 21C16 21 16.5 20.5 17 20C18 19 19 17 19 15C19 13 19.5 11.5 20.5 10C21.5 8.5 23 7 23 4.5C23 3 22 2 21 2C20.5 2 18.5 3.5 17.5 5.5C16.5 3.5 14.5 2 12 2Z" fill="currentColor"/>
+        </svg>
+        <span>{business.name}</span>
+      </a>
+      <p class="footer__tagline">{footer.tagline}</p>
+    </div>
+
+    <nav class="footer__nav" aria-label="Voettekstnavigatie">
+      <div class="footer__nav-col">
+        <h5>Diensten</h5>
+        <a href="#diensten">Preventieve Zorg</a>
+        <a href="#diensten">Esthetische Zorg</a>
+        <a href="#diensten">Specialistische Zorg</a>
+        <a href="#diensten">Kindertandheelkunde</a>
+      </div>
+      <div class="footer__nav-col">
+        <h5>Praktijk</h5>
+        <a href="#over-ons">Over Ons</a>
+        <a href="#team">Ons Team</a>
+        <a href="#vergoeding">Vergoeding</a>
+        <a href="#openingstijden">Openingstijden</a>
+      </div>
+      <div class="footer__nav-col">
+        <h5>Contact</h5>
+        <a href={`tel:${phoneHref}`}>{business.phone}</a>
+        <a href={`mailto:${business.email}`}>{business.email}</a>
+        <a href="#contact">Afspraak Maken</a>
+      </div>
+    </nav>
+
+  </div>
+
+  <div class="footer__bottom">
+    <div class="container footer__bottom-inner">
+      <span>© {year} Tandartspraktijk {business.name}. Alle rechten voorbehouden.</span>
+      <div class="footer__legal">
+        <a href="/privacy">Privacybeleid</a>
+        <a href="/disclaimer">Disclaimer</a>
+        <a href="/klachten">Klachtenregeling</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--color-bg-dark);
+    padding-top: clamp(4rem, 8vw, 6rem);
+  }
+
+  .footer__inner {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr;
+    gap: clamp(3rem, 6vw, 6rem);
+    padding-bottom: clamp(3rem, 5vw, 4.5rem);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .footer__logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    color: var(--color-text-light);
+    margin-bottom: 0.75rem;
+  }
+
+  .footer__tagline { font-size: 0.9375rem; color: rgba(250, 247, 242, 0.45); max-width: 24ch; line-height: 1.6; }
+
+  .footer__nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .footer__nav-col { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .footer__nav-col h5 {
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(250, 247, 242, 0.4);
+    margin-bottom: 0.25rem;
+  }
+
+  .footer__nav-col a { font-size: 0.9375rem; color: rgba(250, 247, 242, 0.65); transition: color 0.15s; }
+  .footer__nav-col a:hover { color: white; }
+
+  .footer__bottom { padding-block: 1.5rem; }
+
+  .footer__bottom-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.8125rem;
+    color: rgba(250, 247, 242, 0.35);
+  }
+
+  .footer__legal { display: flex; gap: 1.5rem; }
+  .footer__legal a { color: rgba(250, 247, 242, 0.35); transition: color 0.15s; }
+  .footer__legal a:hover { color: rgba(250, 247, 242, 0.65); }
+
+  @media (max-width: 768px) {
+    .footer__inner { grid-template-columns: 1fr; }
+    .footer__nav { grid-template-columns: repeat(2, 1fr); }
+    .footer__bottom-inner { flex-direction: column; text-align: center; }
+  }
+  @media (max-width: 480px) { .footer__nav { grid-template-columns: 1fr; } }
+</style>

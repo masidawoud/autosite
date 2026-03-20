@@ -1,0 +1,148 @@
+---
+interface ServiceItem {
+  tag: string;
+  title: string;
+  desc: string;
+  image_url: string;
+  items: string[];
+  cta: string;
+}
+
+interface Props {
+  data: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    items: ServiceItem[];
+  };
+}
+const { data } = Astro.props;
+---
+
+<section class="services section" id="diensten">
+  <div class="container">
+    <div class="services__header">
+      <span class="eyebrow">{data.eyebrow}</span>
+      <h2>{data.title}</h2>
+      <p>{data.subtitle}</p>
+    </div>
+
+    <div class="services__list">
+      {data.items.map((s, i) => (
+        <div class={`service-card ${i % 2 !== 0 ? 'service-card--flipped' : ''}`}>
+          <div class="service-card__image-wrapper">
+            <img
+              src={s.image_url}
+              alt={s.tag}
+              class="service-card__img"
+              loading="lazy"
+            />
+          </div>
+          <div class="service-card__content">
+            <span class="service-card__tag">{s.tag}</span>
+            <h3 class="service-card__title">{s.title}</h3>
+            <p class="service-card__desc">{s.desc}</p>
+            <ul class="service-card__items">
+              {s.items.map(item => (
+                <li>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <a href="#contact" class="btn btn-primary">{s.cta}</a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .services__header {
+    text-align: center;
+    margin-bottom: clamp(3rem, 6vw, 5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .services__header p { max-width: 50ch; text-align: center; font-size: 1.0625rem; }
+
+  .services__list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3.5rem, 7vw, 6rem);
+  }
+
+  .service-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+
+  .service-card--flipped .service-card__image-wrapper { order: 2; }
+  .service-card--flipped .service-card__content { order: 1; }
+
+  .service-card__image-wrapper {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: var(--color-bg-alt);
+  }
+
+  .service-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .service-card:hover .service-card__img { transform: scale(1.04); }
+
+  .service-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .service-card__tag {
+    display: inline-block;
+    background: var(--color-accent-light);
+    color: var(--color-accent);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.375rem 0.875rem;
+    border-radius: 999px;
+    width: fit-content;
+  }
+
+  .service-card__title { font-size: clamp(1.625rem, 3vw, 2.25rem); margin-top: 0.125rem; }
+
+  .service-card__desc { font-size: 1.0625rem; line-height: 1.75; max-width: 44ch; }
+
+  .service-card__items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+  .service-card__items li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--color-text);
+  }
+  .service-card__items svg { color: var(--color-accent); flex-shrink: 0; }
+
+  @media (max-width: 768px) {
+    .service-card { grid-template-columns: 1fr; }
+    .service-card--flipped .service-card__image-wrapper { order: unset; }
+    .service-card--flipped .service-card__content { order: unset; }
+    .service-card__desc { max-width: none; }
+  }
+</style>
