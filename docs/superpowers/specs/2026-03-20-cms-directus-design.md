@@ -16,7 +16,7 @@ A self-serve CMS for dental practice clients. Clients log in at `directus.yourdo
 ## System architecture
 
 ```
-Directus (Fly.io Phase 1 ~$3-5/mo, Railway ~$10/mo production)
+Directus (Render Phase 1 — free tier, Railway ~$10/mo production)
   ├── PostgreSQL DB
   ├── Admin UI at directus.yourdomain.com/admin
   ├── REST API (content read/write for pipeline)
@@ -160,12 +160,11 @@ GitHub Action (deploy.yml) receives client_id input:
 
 ## Hosting
 
-### Phase 1 — Fly.io (~$3–5/mo)
-- Fly.io eliminated its free tier in late 2023. A credit card is required.
-- Directus needs at minimum a 512MB RAM machine (shared-cpu-1x 512MB ~$3.19/mo)
-- PostgreSQL on a Fly.io volume (~1GB sufficient for Phase 1, ~$0.15/mo)
-- No spin-down (Fly.io machines stay running, unlike Render free tier)
-- Estimated cost: ~$3–5/mo
+### Phase 1 — Render (free tier)
+- Free web service for Directus — spins down after 15 min inactivity (acceptable for a trial/PoC)
+- Free PostgreSQL — available for 90 days, sufficient for Phase 1 validation
+- No credit card required
+- Cost: $0
 
 ### Production — Railway (~$10/mo)
 - Directus service + PostgreSQL service
@@ -176,10 +175,10 @@ GitHub Action (deploy.yml) receives client_id input:
 
 ## Phasing
 
-### Phase 1 — Proof of concept *(low-cost exit point)*
-Directus on Fly.io. `site_configs` collection only. Client role with row-level permissions. One demo client end-to-end: Directus save → GitHub Action → Cloudflare Pages deploy. Manual onboarding.
+### Phase 1 — Proof of concept *(free exit point)*
+Directus on Render (free tier). `site_configs` collection only. Client role with row-level permissions. One demo client end-to-end: Directus save → GitHub Action → Cloudflare Pages deploy. Manual onboarding.
 
-**Reversibility:** delete Fly.io app, delete GitHub Action workflow. Zero impact on existing pipeline or production sites.
+**Reversibility:** delete Render app, delete GitHub Action workflow. Zero impact on existing pipeline or production sites.
 
 ### Phase 2 — Multi-page + blocks
 `pages` collection + M2A blocks. Block collections for all 11 existing section types + `block_text` (WYSIWYG). `[...slug].astro` dynamic routing in dental-template. Clients can create pages and manage section order.
