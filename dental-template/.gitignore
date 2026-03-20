@@ -4,3 +4,6 @@ node_modules/
 .env.*
 !.env.example
 .DS_Store
+# TinaCMS generated files
+tina/__generated__/
+public/admin/
