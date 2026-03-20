@@ -22,24 +22,29 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        working-directory: dental-template
         run: npm ci
 
       - name: Fetch content from Directus
+        working-directory: dental-template
         run: node scripts/fetch-content.js "${{ inputs.client_id }}"
         env:
           DIRECTUS_URL: ${{ secrets.DIRECTUS_URL }}
           DIRECTUS_TOKEN: ${{ secrets.DIRECTUS_TOKEN }}
 
       - name: Build Astro site
+        working-directory: dental-template
         run: npm run build
 
       - name: Create Cloudflare Pages project (idempotent)
+        working-directory: dental-template
         run: npx wrangler pages project create "${{ inputs.client_id }}" --production-branch main || true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy to Cloudflare Pages
+        working-directory: dental-template
         run: npx wrangler pages deploy dist/ --project-name "${{ inputs.client_id }}" --branch main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
