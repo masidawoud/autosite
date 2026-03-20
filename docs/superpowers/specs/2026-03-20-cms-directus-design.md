@@ -131,10 +131,15 @@ Steps 2–4 are all operator API calls (can be scripted as a one-liner). Phase 3
 
 ## Build trigger flow
 
+Two separate actions in the Directus admin UI:
+
+- **Save** — standard Directus save button. Writes changes to the database. No deploy triggered. Clients can save drafts freely.
+- **Deploy** — a custom button powered by a Directus Flow (Manual trigger). Appears on the `site_configs` item page. On click, POSTs to the GitHub API to trigger a build. Only the operator or the client for that site can trigger it.
+
 ```
-Client saves content in Directus
-  → Directus Flow (trigger: on item update/create for site_configs, pages, block_*)
-  → Resolve client_id from affected record
+Client clicks Deploy button in Directus
+  → Directus Flow (trigger: Manual, scoped to site_configs item)
+  → Read client_id from current item
   → POST https://api.github.com/repos/{operator}/dental-template/actions/workflows/deploy.yml/dispatches
       headers: Authorization: Bearer {DIRECTUS_GITHUB_PAT}   ← PAT stored in Directus env, not Actions
       body: { "ref": "main", "inputs": { "client_id": "tandarts-amsterdam" } }
@@ -152,7 +157,7 @@ GitHub Action (deploy.yml) receives client_id input:
 
 **One GitHub Action, all clients.** Only `client_id` changes per run. Parallel deploys are safe — each run operates in its own workspace.
 
-**Known limitation — concurrent saves:** If a client saves multiple fields in quick succession, each save dispatches a separate `workflow_dispatch`. GitHub Actions queues all of them and runs them serially. Redundant but harmless for Phase 1. A debounce mechanism (skip dispatch if a run for this `client_id` is already queued/running) should be added before production scale.
+**No redundant deploy problem.** Because deploys are client-initiated via the Deploy button rather than auto-triggered on save, there is no risk of queued duplicate runs.
 
 **Secrets and credentials:**
 
