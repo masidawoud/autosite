@@ -111,12 +111,21 @@ Client role permissions:
 
 Clients see only their own data — other clients' records are invisible at the API level, not just the UI.
 
+**Email setup (required):**
+Directus needs SMTP configured to send invite emails. Set the following env vars on the Fly.io app:
+- `EMAIL_FROM` — sender address e.g. `cms@yourdomain.com`
+- `EMAIL_SMTP_HOST`, `EMAIL_SMTP_PORT`, `EMAIL_SMTP_USER`, `EMAIL_SMTP_PASSWORD`
+
+Recommended: **Resend** (free tier — 3,000 emails/month). Takes ~5 minutes to configure.
+
 **Onboarding a new client (manual — Phase 1 and 2):**
 1. Run `build-sites.js` → generates initial content via Groq
 2. POST to Directus API → creates `site_configs` record with generated content
-3. Create Directus user via API (email + Client role + link to `site_configs` record)
-4. Use Directus built-in invite flow → client receives email, sets own password
+3. POST to Directus API → creates user record (email + Client role + linked to `site_configs`)
+4. POST `/users/invite` → Directus sends invite email to client; client clicks link, lands on `directus.yourdomain.com/admin/accept-invite`, sets own password
 5. Trigger first deploy via GitHub API `workflow_dispatch`
+
+Steps 2–4 are all operator API calls (can be scripted as a one-liner). Phase 3 automates them into `build-sites.js`.
 
 ---
 
