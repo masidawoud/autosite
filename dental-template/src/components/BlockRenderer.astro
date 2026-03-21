@@ -1,0 +1,38 @@
+---
+/**
+ * Renders the correct Astro component for a given block.
+ * block.collection maps to the Directus block collection name.
+ * block.item contains the block's field data (stripped of id/owner).
+ * business is passed from site.json for components that need contact details.
+ */
+import Hero from './Hero.astro'
+import Quote from './Quote.astro'
+import Features from './Features.astro'
+import Services from './Services.astro'
+import About from './About.astro'
+import Reviews from './Reviews.astro'
+import OpeningHours from './OpeningHours.astro'
+import Vergoeding from './Vergoeding.astro'
+import Contact from './Contact.astro'
+import Footer from './Footer.astro'
+
+interface Props {
+  collection: string
+  item: Record<string, unknown>
+  business: Record<string, unknown>
+}
+
+const { collection, item, business } = Astro.props
+---
+
+{collection === 'block_hero'          && <Hero data={item} business={business} />}
+{collection === 'block_quote'         && <Quote data={item} />}
+{collection === 'block_features'      && <Features data={item} />}
+{collection === 'block_services'      && <Services data={item} />}
+{collection === 'block_about'         && <About data={item} />}
+{collection === 'block_reviews'       && <Reviews data={item} />}
+{collection === 'block_opening_hours' && <OpeningHours data={item} business={business} />}
+{collection === 'block_vergoeding'    && <Vergoeding data={item} />}
+{collection === 'block_contact'       && <Contact data={item} business={business} />}
+{collection === 'block_footer'        && <Footer business={business} footer={item} />}
+{collection === 'block_text'          && <div class="block-text container section" set:html={item.content} />}

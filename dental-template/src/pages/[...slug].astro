@@ -1,0 +1,54 @@
+---
+/**
+ * Dynamic routing for block-driven pages.
+ * Reads all src/data/pages/*.json files at build time via import.meta.glob.
+ * index.astro still handles the homepage (site.json, hardcoded order).
+ * This file handles all other slugs (e.g. /over-ons, /diensten).
+ *
+ * If src/data/pages/ contains no files (no pages configured in Directus),
+ * getStaticPaths returns [] and no extra pages are generated — that is correct.
+ */
+import site from '../data/site.json'
+import Layout from '../layouts/Layout.astro'
+import Nav from '../components/Nav.astro'
+import BlockRenderer from '../components/BlockRenderer.astro'
+
+export async function getStaticPaths() {
+  // import.meta.glob returns {} when no files match — safe with no pages
+  const modules = import.meta.glob('../data/pages/*.json', { eager: true })
+
+  return Object.values(modules)
+    .map((mod: any) => mod.default)
+    // Exclude 'home' slug — the homepage is handled by index.astro (site.json).
+    // Without this filter, a pages/home.json would generate a duplicate /home route.
+    .filter(page => page.slug !== 'home')
+    .map(page => ({
+      params: { slug: page.slug },
+      props:  { page },
+    }))
+}
+
+interface Props {
+  page: {
+    slug: string
+    title: string
+    status: string
+    blocks: Array<{ collection: string; item: Record<string, unknown> }>
+  }
+}
+
+const { page } = Astro.props
+---
+
+<Layout title={`${page.title} – ${site.business.name}`}>
+  <Nav business={site.business} />
+  <main>
+    {page.blocks.map(block => (
+      <BlockRenderer
+        collection={block.collection}
+        item={block.item}
+        business={site.business}
+      />
+    ))}
+  </main>
+</Layout>
