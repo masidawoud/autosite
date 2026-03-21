@@ -42,6 +42,39 @@ export function reconstructTheme(config, presets) {
 }
 
 /**
+ * Transforms raw Directus pages API response into clean page objects for Astro.
+ * Sorts blocks by `sort` field, strips internal fields (id, owner) from block items.
+ *
+ * @param {Array} pagesData - Array of page objects from Directus /items/pages response
+ * @returns {Array} Clean page objects: [{ slug, title, status, blocks: [{ collection, item }] }]
+ */
+export function transformPages(pagesData) {
+  return pagesData.map(page => ({
+    slug: page.slug,
+    title: page.title,
+    status: page.status,
+    blocks: (page.blocks || [])
+      // Directus sets sort=null when blocks haven't been drag-reordered.
+      // null ?? 0 makes all unsorted blocks equal; V8 (Node 20) stable sort
+      // preserves insertion order in that case.
+      .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+      .map(b => ({
+        collection: b.collection,
+        item: stripInternalFields(b.item),
+      })),
+  }))
+}
+
+/**
+ * Removes Directus-internal fields (id, owner) from a block item object.
+ */
+function stripInternalFields(item) {
+  if (!item || typeof item !== 'object') return item
+  const { id, owner, ...rest } = item
+  return rest
+}
+
+/**
  * Lightens a hex color by mixing it toward white.
  * amount=0.85 means 85% toward white.
  */

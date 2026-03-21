@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { applyBusinessFields, reconstructTheme } from './content-transform.js'
+import { applyBusinessFields, reconstructTheme, transformPages } from './content-transform.js'
 
 const baseSiteJson = {
   meta: { title: 'Old Title', description: 'Old desc' },
@@ -109,5 +109,68 @@ describe('reconstructTheme', () => {
   it('uses the correct preset from siteConfig.theme_preset', () => {
     const result = reconstructTheme(siteConfig, { 'warm-editorial': warmEditorialPreset })
     assert.equal(result.preset, 'warm-editorial')
+  })
+})
+
+// Simulated Directus pages API response (two pages, one with two blocks)
+const rawPages = [
+  {
+    id: 'uuid-1',
+    title: 'Over Ons',
+    slug: 'over-ons',
+    status: 'published',
+    blocks: [
+      {
+        sort: 2,
+        collection: 'block_quote',
+        item: { id: 'uuid-q1', text: 'Great care.', author_name: 'Dr. A', author_role: 'Tandarts', owner: 'user-uuid' }
+      },
+      {
+        sort: 1,
+        collection: 'block_hero',
+        item: { id: 'uuid-h1', headline: 'Over Ons', eyebrow: 'Team', description: 'Wij zijn...', owner: 'user-uuid' }
+      },
+    ]
+  },
+  {
+    id: 'uuid-2',
+    title: 'Diensten',
+    slug: 'diensten',
+    status: 'published',
+    blocks: []
+  },
+]
+
+describe('transformPages', () => {
+  it('returns one entry per page', () => {
+    const result = transformPages(rawPages)
+    assert.equal(result.length, 2)
+  })
+
+  it('preserves slug, title, status', () => {
+    const result = transformPages(rawPages)
+    assert.equal(result[0].slug, 'over-ons')
+    assert.equal(result[0].title, 'Over Ons')
+    assert.equal(result[0].status, 'published')
+  })
+
+  it('sorts blocks by sort field ascending', () => {
+    const result = transformPages(rawPages)
+    const blocks = result[0].blocks
+    assert.equal(blocks[0].collection, 'block_hero')   // sort: 1
+    assert.equal(blocks[1].collection, 'block_quote')  // sort: 2
+  })
+
+  it('strips owner and id from block items', () => {
+    const result = transformPages(rawPages)
+    const heroItem = result[0].blocks[0].item
+    assert.equal(heroItem.owner, undefined)
+    assert.equal(heroItem.id, undefined)
+    assert.equal(heroItem.headline, 'Over Ons')
+  })
+
+  it('handles page with no blocks', () => {
+    const result = transformPages(rawPages)
+    assert.deepEqual(result[1].blocks, [])
   })
 })
