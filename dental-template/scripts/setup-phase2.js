@@ -45,13 +45,19 @@ async function createCollection(name, fields, note = '') {
   })
   console.log(`✓ collection: ${name} (${allFields.length} fields)`)
 
-  // Register the M2O relation for the owner field
-  await api('POST', '/relations', {
-    collection: name,
-    field: 'owner',
-    related_collection: 'directus_users',
-  })
-  console.log(`  ✓ owner → directus_users`)
+  // Attempt to register the M2O relation for owner → directus_users.
+  // Non-fatal: the permission filter {"owner":{"_eq":"$CURRENT_USER"}} works
+  // on a plain UUID column even without a formal relation record.
+  try {
+    await api('POST', '/relations', {
+      collection: name,
+      field: 'owner',
+      related_collection: 'directus_users',
+    })
+    console.log(`  ✓ owner → directus_users`)
+  } catch (e) {
+    console.log(`  ⚠ owner relation skipped (${e.message.slice(0, 60)}) — permission filter still works`)
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -171,12 +177,16 @@ await api('POST', '/collections', {
 })
 console.log('✓ collection: pages')
 
-await api('POST', '/relations', {
-  collection: 'pages',
-  field: 'site',
-  related_collection: 'site_configs',
-})
-console.log('  ✓ site → site_configs')
+try {
+  await api('POST', '/relations', {
+    collection: 'pages',
+    field: 'site',
+    related_collection: 'site_configs',
+  })
+  console.log('  ✓ site → site_configs')
+} catch (e) {
+  console.log(`  ⚠ site relation skipped — add manually via Directus UI if needed`)
+}
 
 console.log('\n✅ Phase 2 collections created.')
 console.log('\nNEXT: Add the M2A "blocks" field on "pages" via Directus UI:')
