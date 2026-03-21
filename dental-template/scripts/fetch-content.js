@@ -51,18 +51,17 @@ if (!config) {
 }
 
 // ── 2. Fetch published pages with M2A blocks ───────────────────────────────
-const BLOCK_COLLECTIONS = [
-  'block_hero', 'block_quote', 'block_features', 'block_services',
-  'block_about', 'block_reviews', 'block_opening_hours', 'block_vergoeding',
-  'block_contact', 'block_footer', 'block_text',
-]
-
-// M2A requires explicit per-collection selectors — blocks.*.* does not work
-const blockFields = BLOCK_COLLECTIONS.map(c => `blocks.item:${c}.*`).join(',')
-const pagesFields = `id,title,slug,status,blocks.sort,blocks.collection,${blockFields}`
+// Use site_config.id (integer FK) to filter pages — avoids relational filter
+// permission issues with filter[site.client_id] on some Directus deployments.
+// blocks.item.* hydrates all block types; per-collection colon syntax is broken
+// in Directus v11.16.1.
+// blocks.item.* hydrates all M2A block types in Directus v11.
+// The * must be percent-encoded (%2A) — Directus v11 strips unencoded wildcards
+// in query strings when passed via programmatic fetch.
+const pagesFields = 'id,title,slug,status,blocks.sort,blocks.collection,blocks.item.%2A'
 
 const rawPages = await get(
-  `/items/pages?filter[site.client_id][_eq]=${encodeURIComponent(clientId)}&filter[status][_eq]=published&fields=${pagesFields}`
+  `/items/pages?filter[site][_eq]=${config.id}&filter[status][_eq]=published&fields=${pagesFields}`
 )
 
 // ── 3. Load base site.json + theme presets ─────────────────────────────────
