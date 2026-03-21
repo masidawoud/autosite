@@ -301,7 +301,7 @@ Expected output confirms the project is created. Verify it: open `https://dash.c
 
 The live domain will be `autosite-trial.pages.dev`. If this name is already taken, choose a different name and substitute it throughout this plan and in the Gitea OAuth redirect URI configured in Task 3.
 
-- [ ] **Step 3: Add secrets to the `client-test` repo on Gitea**
+- [ ] **Step 2: Add secrets to the `client-test` repo on Gitea**
 
 In Gitea: open `client-test` repo → Settings → Actions → Secrets → Add Secret.
 
