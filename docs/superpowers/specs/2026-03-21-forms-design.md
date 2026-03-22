@@ -2,7 +2,9 @@
 
 **Date:** 2026-03-21
 **Type:** Feature spec
-**Status:** Directionally confirmed — validation required before implementation
+**Status:** SUPERSEDED — see `2026-03-22-contact-form-design.md`
+
+> This spec was written for TinaCMS and is no longer valid. The CMS decision changed to Sveltia CMS + self-hosted Gitea. The contact form solution is now CF Worker + CF KV + Resend EU + Cloudflare Turnstile. Do not implement from this spec.
 
 ---
 

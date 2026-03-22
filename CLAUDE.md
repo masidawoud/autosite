@@ -18,8 +18,14 @@ AutoSite is an automated pipeline that generates and deploys production-ready we
 - **CSS custom properties** — theming system, no Tailwind
 - **Groq API** (llama-3.3-70b-versatile) — content generation during testing; swap to Claude for production
 - **Cloudflare Pages** — hosting, deployed via Wrangler CLI
+- **Cloudflare Worker** — shared contact form backend (`workers/forms-worker/`), routed by project name
+- **Cloudflare KV** — per-client form config (recipient email, confirmation message)
+- **Cloudflare Turnstile** — spam protection on contact forms (one site key for all clients)
+- **Resend EU (Frankfurt)** — transactional email delivery for contact form submissions
 - **Node.js (ESM)** — pipeline script
 - **prospects.csv** — operator's source of truth for all prospects
+- **Sveltia CMS** — client-facing CMS, served at `/admin` on each client's CF Pages site
+- **Self-hosted Gitea on Hetzner VPS** — Git backend for Sveltia CMS; one repo per client; act runner handles CI/CD
 
 ---
 
@@ -163,26 +169,19 @@ The architecture direction agreed on (not yet built):
 - One script triggers GitHub Actions across all client repos via GitHub API
 - All sites rebuild with updated component; client content untouched
 
-**CMS:** Decap CMS (supports drag-and-drop list fields for section ordering) connected to each client's GitHub repo.
+**CMS: Sveltia CMS + self-hosted Gitea on Hetzner VPS** — fully validated 2026-03-21. Clients log in with email/password only, no GitHub account needed. Zero consent screen confirmed (set `uid=0` on OAuth app via SSH+SQLite).
+
+**Contact form: CF Worker + CF KV + Resend EU + Cloudflare Turnstile** — designed 2026-03-22. One shared Worker handles all clients, routed by `project_name`. Spec: `docs/superpowers/specs/2026-03-22-contact-form-design.md`.
+
+**Full CMS integration** — designed 2026-03-22. Complete `config.yml` field definitions, 6 new section components (FAQ, Gallery, Before/After, Map, Emergency Banner, Pricing), dynamic section renderer, Nav/Footer client-editable. Spec: `docs/superpowers/specs/2026-03-22-cms-full-integration-design.md`.
+
+**New pages** — designed 2026-03-22. Client-created Markdown pages at flat slugs (`/over-ons`), WYSIWYG body, per-page SEO fields. Spec: `docs/superpowers/specs/2026-03-22-new-pages-design.md`.
+
+**TODO — implementation plans needed** (specs approved, plans not yet written):
+1. Contact form: deploy CF Worker, provision KV, update `Contact.astro`
+2. Full CMS integration: complete `config.yml`, new components, dynamic renderer, provisioning changes to `build-sites.js`
+3. New pages: `[slug].astro`, content collection, deploy workflow update
+4. Production provisioning: script full client onboarding into `build-sites.js` (Gitea user/repo/secrets, uid=0 patch, named Cloudflare Tunnel, CF Pages project)
 
 ---
 
-## Planned feature — prospect site analysis
-
-Before generating `site.json`, scrape the prospect's existing website and have an LLM extract its current structure. Feed that analysis into the content generation prompt so the new site mirrors the prospect's existing information architecture while improving design and copy.
-
-**What this requires:**
-
-1. Add `existing_url` column to `prospects.csv`
-2. New pipeline step `scrapeProspectSite(url)` — fetch HTML, strip boilerplate, extract readable text (use a headless browser like Playwright for JS-heavy sites, or plain `fetch` + cheerio for simple ones)
-3. New step `analyseStructure(client, rawHtml)` — LLM call that returns a structured summary:
-   - Which sections exist (hero, about, services list, team, contact, etc.)
-   - Key copy snippets (headline, tagline, USPs)
-   - Services offered
-   - Team members mentioned
-4. Inject this analysis into the existing `buildPrompt()` alongside the CSV data — the LLM then generates copy that's informed by the real site rather than just the scraped_text field
-
-**Key prompt instruction to add:**
-> "The prospect's current site has the following structure and content. Use this as a reference to ensure we capture everything relevant, but rewrite all copy to be more engaging, modern and patient-focused."
-
-**Feasibility:** Straightforward addition to the pipeline. Cheerio handles most static dental sites. Playwright needed only if the site is React/JS-rendered. The main cost is an extra LLM call per prospect for the analysis step.

@@ -3,3 +3,4 @@ builds/
 .env
 .DS_Store
 .worktrees/
+fly.toml
