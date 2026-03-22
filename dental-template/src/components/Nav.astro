@@ -4,8 +4,16 @@ interface Props {
     name: string;
     phone: string;
   };
+  nav: {
+    links: Array<{ label: string; href: string }>;
+  };
 }
-const { business } = Astro.props;
+const { business, nav = { links: [
+  { label: 'Diensten', href: '#diensten' },
+  { label: 'Team', href: '#over-ons' },
+  { label: 'Vergoeding', href: '#vergoeding' },
+  { label: 'Contact', href: '#contact' }
+] } } = Astro.props;
 ---
 
 <header class="nav" id="nav">
@@ -18,10 +26,9 @@ const { business } = Astro.props;
     </a>
 
     <nav class="nav__links" aria-label="Hoofdnavigatie">
-      <a href="#diensten">Diensten</a>
-      <a href="#over-ons">Over Ons</a>
-      <a href="#vergoeding">Vergoeding</a>
-      <a href="#contact">Contact</a>
+      {nav.links.map(link => (
+        <a href={link.href}>{link.label}</a>
+      ))}
     </nav>
 
     <a href="#contact" class="btn btn-primary nav__cta">Afspraak Maken</a>
@@ -42,10 +49,9 @@ const { business } = Astro.props;
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
     </button>
-    <a href="#diensten">Diensten</a>
-    <a href="#over-ons">Over Ons</a>
-    <a href="#vergoeding">Vergoeding</a>
-    <a href="#contact">Contact</a>
+    {nav.links.map(link => (
+      <a href={link.href}>{link.label}</a>
+    ))}
     <a href="#contact" class="btn btn-primary">Afspraak Maken</a>
   </div>
 </header>
