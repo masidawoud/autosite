@@ -168,21 +168,29 @@ function buildCmsDefaults(prospect) {
   };
 }
 
-// ── Dummy site.json (no API) ──────────────────────────────────────────────────
+// ── Dummy data (no API) ───────────────────────────────────────────────────────
 
-function buildDummySiteJson(prospect) {
-  const template = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/site.json'), 'utf-8'));
+function buildDummyConfig(prospect) {
+  const template = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/config.json'), 'utf-8'));
   template.meta.title       = `${prospect.business_name} – ${prospect.city}`;
   template.meta.description = `Tandartspraktijk in ${prospect.city}. Professionele zorg voor uw gebit.`;
-  template.business.name         = prospect.business_name;
-  template.business.city         = prospect.city;
-  template.business.address      = prospect.address;
-  template.business.postal_code  = prospect.postal_code;
-  template.business.phone        = prospect.phone;
-  template.business.email        = prospect.email;
-  template.hero.eyebrow   = `Tandarts ${prospect.city}`;
-  template.hero.image_url = 'https://picsum.photos/seed/dental-hero/720/860';
+  template.business.name        = prospect.business_name;
+  template.business.city        = prospect.city;
+  template.business.address     = prospect.address;
+  template.business.postal_code = prospect.postal_code;
+  template.business.phone       = prospect.phone;
+  template.business.email       = prospect.email;
   template.contact_form.recipient_email = (prospect.form_recipient_email || prospect.email || '').trim();
+  return template;
+}
+
+function buildDummyHomePage(prospect) {
+  const template = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/pages/home.json'), 'utf-8'));
+  const hero = template.sections.find(s => s.type === 'hero');
+  if (hero) {
+    hero.eyebrow   = `Tandarts ${prospect.city}`;
+    hero.image_url = 'https://picsum.photos/seed/dental-hero/720/860';
+  }
   return template;
 }
 
@@ -506,18 +514,47 @@ async function main() {
         console.log(`    ✓ Using existing build at builds/${prospect.id}/dist`);
       } else {
         // 1. Generate site content
-        let siteJson;
+        let configJson, homeJson;
         if (dummy) {
-          siteJson = buildDummySiteJson(prospect);
+          configJson = buildDummyConfig(prospect);
+          homeJson   = buildDummyHomePage(prospect);
           console.log('    ✓ Dummy content ready');
         } else {
           console.log('    ⟳ Generating content...');
-          siteJson = await generateSiteJson(client, prospect);
-          // Merge CMS fields that Groq does not generate
-          const cms = buildCmsDefaults(prospect);
-          siteJson.nav          = cms.nav;
-          siteJson.contact_form = cms.contact_form;
-          siteJson.footer       = { ...(siteJson.footer ?? {}), social: cms.footer_social };
+          const siteJson = await generateSiteJson(client, prospect);
+          // Split Groq output (old site.json format) into config.json + pages/home.json
+          const recipientEmail = (prospect.form_recipient_email || prospect.email || '').trim();
+          configJson = {
+            meta:     siteJson.meta,
+            business: siteJson.business,
+            nav:      siteJson.nav ?? buildCmsDefaults(prospect).nav,
+            footer:   { ...(siteJson.footer ?? {}), social: [] },
+            contact_form: {
+              recipient_email:      recipientEmail,
+              confirmation_message: 'Bedankt! Wij nemen binnen één werkdag contact op.',
+            },
+            emergency: {
+              text:    'Spoedeisende tandheelkundige hulp nodig? Wij staan voor u klaar.',
+              phone:   siteJson.business?.phone ?? '',
+              enabled: false,
+            },
+          };
+          const coreTypes = ['hero','quote','features','services','team','reviews','hours','vergoeding','contact'];
+          const templateHome = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/pages/home.json'), 'utf-8'));
+          homeJson = {
+            sections: [
+              { type: 'hero',       enabled: true, ...siteJson.hero       },
+              { type: 'quote',      enabled: true, ...siteJson.quote      },
+              { type: 'features',   enabled: true, ...siteJson.features   },
+              { type: 'services',   enabled: true, ...siteJson.services   },
+              { type: 'team',       enabled: true, ...siteJson.team       },
+              { type: 'reviews',    enabled: true, ...siteJson.reviews    },
+              { type: 'hours',      enabled: true, ...siteJson.hours      },
+              { type: 'vergoeding', enabled: true, ...siteJson.vergoeding },
+              { type: 'contact',    enabled: true, ...siteJson.contact    },
+              ...templateHome.sections.filter(s => !coreTypes.includes(s.type)),
+            ],
+          };
           console.log('    ✓ Content generated');
         }
 
@@ -531,24 +568,10 @@ async function main() {
         console.log('    ✓ Template ready');
 
         // 4. Write data files
-        fs.writeFileSync(path.join(buildDir, 'src/data/site.json'),  JSON.stringify(siteJson,  null, 2));
-        fs.writeFileSync(path.join(buildDir, 'src/data/theme.json'), JSON.stringify(themeJson, null, 2));
-
-        // Write new optional-section placeholder files (read from template)
-        const NEW_DATA_FILES = [
-          'sections.json',
-          'faq.json',
-          'gallery.json',
-          'before_after.json',
-          'map.json',
-          'emergency.json',
-          'pricing.json',
-        ];
-        for (const filename of NEW_DATA_FILES) {
-          const src  = path.join(TEMPLATE_DIR, 'src/data', filename);
-          const dest = path.join(buildDir, 'src/data', filename);
-          fs.copyFileSync(src, dest);
-        }
+        fs.mkdirSync(path.join(buildDir, 'src/data/pages'), { recursive: true });
+        fs.writeFileSync(path.join(buildDir, 'src/data/config.json'),       JSON.stringify(configJson, null, 2));
+        fs.writeFileSync(path.join(buildDir, 'src/data/pages/home.json'),   JSON.stringify(homeJson,   null, 2));
+        fs.writeFileSync(path.join(buildDir, 'src/data/theme.json'),        JSON.stringify(themeJson,  null, 2));
 
         console.log('    ✓ Data files written');
 

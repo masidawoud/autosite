@@ -1,0 +1,49 @@
+<h2>Content Model</h2>
+<p class="subtitle">Five TinaCMS collections — each maps to a file or folder in the client repo</p>
+
+<div style="display:grid;gap:16px;margin-top:24px">
+
+  <div style="display:grid;grid-template-columns:180px 1fr 1fr;gap:0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)">
+    <div style="padding:12px 16px;background:rgba(255,255,255,0.08);font-weight:600;font-size:13px;display:flex;align-items:center">Business Info</div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)">Name, address, phone, email, Google reviews score/count/url</div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)"><code>site.json → business</code></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:180px 1fr 1fr;gap:0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)">
+    <div style="padding:12px 16px;background:rgba(255,255,255,0.08);font-weight:600;font-size:13px;display:flex;align-items:center">Theme</div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)">Accent color (color picker), style preset (dropdown: warm-editorial / ocean-depths / tech-innovation)</div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)"><code>theme.json</code></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:180px 1fr 1fr;gap:0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)">
+    <div style="padding:12px 16px;background:rgba(255,255,255,0.08);font-weight:600;font-size:13px;display:flex;align-items:center">Home Page Sections</div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)">
+      Ordered list of sections — drag to reorder, toggle to enable/disable, add from section library.<br><br>
+      Each section type has its own fields:<br>
+      <span style="opacity:0.7">Hero (headline, description, CTA), Quote, Features (6 items), Services (3 cards), Team (members), Reviews, Opening Hours, Insurance, Contact</span>
+    </div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)"><code>sections.json</code> (order + enabled)<br><br><code>site.json</code> (section content)</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:180px 1fr 1fr;gap:0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)">
+    <div style="padding:12px 16px;background:rgba(255,255,255,0.08);font-weight:600;font-size:13px;display:flex;align-items:center">Pages</div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)">
+      Each page has: title, slug, template (treatment / info / blank), structured fields from template, + optional WYSIWYG block.<br><br>
+      WYSIWYG supports: headings, paragraphs, bold/italic, images, simple tables, bullet lists.
+    </div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)"><code>pages/[slug].json</code><br><br>One file per page</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:180px 1fr 1fr;gap:0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)">
+    <div style="padding:12px 16px;background:rgba(255,255,255,0.08);font-weight:600;font-size:13px;display:flex;align-items:center">Menu</div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)">
+      Ordered list of nav items. Each item: label, link (home section anchor or page slug), optional children (one level of nesting = dropdown).
+    </div>
+    <div style="padding:12px 16px;font-size:13px;color:var(--color-muted);border-left:1px solid rgba(255,255,255,0.07)"><code>menu.json</code></div>
+  </div>
+
+</div>
+
+<div style="margin-top:24px;padding:16px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:13px">
+  <strong>What clients cannot touch:</strong> <span style="color:var(--color-muted)">Component HTML/CSS, template structure, font definitions, image CDN URLs hardcoded in templates. These stay in dental-template under operator control.</span>
+</div>

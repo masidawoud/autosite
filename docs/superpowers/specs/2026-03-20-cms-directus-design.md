@@ -1,5 +1,7 @@
 # CMS — Directus Design Spec
 
+> ⚠️ **PARKED (2026-03-21)** — Directus Phase 1 + Phase 2 fully built and working, but self-hosted Postgres and manual schema management deemed overkill for current scale. Branch `feature/cms-directus-phase2` tagged `phase2-complete` kept for reference. Next direction: TinaCMS self-hosted with alternative auth (no GitHub required).
+
 > Replaces the abandoned TinaCMS approach (`2026-03-20-cms-tinacms-design.md`).
 > TinaCMS required clients to have GitHub accounts — dealbreaker for non-technical users.
 

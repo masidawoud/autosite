@@ -1,0 +1,83 @@
+<h2>Per-client Setup Flow</h2>
+<p class="subtitle">What happens when a new dental practice is onboarded — initially semi-manual, scriptable over time</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px">
+
+  <div>
+    <h3 style="margin-bottom:16px">Onboarding steps</h3>
+    <div style="display:grid;gap:10px">
+
+      <div style="display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(110,231,183,0.2);border:1px solid #6ee7b7;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#6ee7b7">1</div>
+        <div style="padding-top:6px">
+          <div style="font-size:13px;font-weight:600">Run existing pipeline</div>
+          <div style="font-size:12px;color:var(--color-muted);margin-top:2px">node build-sites.js generates site.json via Groq, builds theme. Content files are ready in builds/{id}/</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(110,231,183,0.2);border:1px solid #6ee7b7;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#6ee7b7">2</div>
+        <div style="padding-top:6px">
+          <div style="font-size:13px;font-weight:600">Create private GitHub repo</div>
+          <div style="font-size:12px;color:var(--color-muted);margin-top:2px">Named e.g. <code>client-tandarts-amsterdam</code>. Push initial content files: site.json, theme.json, sections.json, menu.json, pages/. Add GitHub Action workflow file.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(110,231,183,0.2);border:1px solid #6ee7b7;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#6ee7b7">3</div>
+        <div style="padding-top:6px">
+          <div style="font-size:13px;font-weight:600">Connect to Tina Cloud</div>
+          <div style="font-size:12px;color:var(--color-muted);margin-top:2px">Create project in Tina Cloud dashboard, link to client repo. Create client login (email + password). Client never sees GitHub.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(110,231,183,0.2);border:1px solid #6ee7b7;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#6ee7b7">4</div>
+        <div style="padding-top:6px">
+          <div style="font-size:13px;font-weight:600">Add repo secrets</div>
+          <div style="font-size:12px;color:var(--color-muted);margin-top:2px">CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, TINA_CLIENT_ID, TINA_TOKEN — all set once per client repo via GitHub API or dashboard.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(110,231,183,0.2);border:1px solid #6ee7b7;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#6ee7b7">5</div>
+        <div style="padding-top:6px">
+          <div style="font-size:13px;font-weight:600">Send client their login</div>
+          <div style="font-size:12px;color:var(--color-muted);margin-top:2px">URL: tandartspraktijk.pages.dev/admin. Email + temporary password. Done.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div>
+    <h3 style="margin-bottom:16px">GitHub Action (per client repo)</h3>
+    <div class="mockup">
+      <div class="mockup-header">.github/workflows/deploy.yml</div>
+      <div class="mockup-body" style="font-size:12px;font-family:monospace;line-height:1.8;color:var(--color-muted)">
+        trigger: push to main<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;OR repository_dispatch<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(for template updates)<br>
+        <br>
+        steps:<br>
+        1. checkout client repo<br>
+        2. clone dental-template<br>
+        3. copy content files into template<br>
+        4. npm install (cached)<br>
+        5. npm run build<br>
+        6. wrangler pages deploy
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding:14px 16px;background:rgba(255,255,255,0.05);border-radius:8px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">Template update trigger</div>
+      <div style="font-size:13px;color:var(--color-muted)">When operator pushes to dental-template, a script calls GitHub API to dispatch <code>repository_dispatch</code> on all client repos → all GitHub Actions fire → all sites rebuild with updated components. Client content untouched.</div>
+    </div>
+
+    <div style="margin-top:12px;padding:14px 16px;background:rgba(255,255,255,0.05);border-radius:8px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">Automation potential</div>
+      <div style="font-size:13px;color:var(--color-muted)">Steps 2–4 are fully scriptable via GitHub API (create repo, push files, set secrets, create Tina Cloud project). Initially manual is fine — automate when you're onboarding more than a few clients/week.</div>
+    </div>
+  </div>
+
+</div>

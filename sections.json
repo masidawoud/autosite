@@ -1,0 +1,14 @@
+{
+  "pages": {
+    "home": [
+      {
+        "id": "test",
+        "enabled": false
+      },
+      {
+        "id": "test2",
+        "enabled": false
+      }
+    ]
+  }
+}

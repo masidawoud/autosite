@@ -1,0 +1,72 @@
+<h2>Template Changes</h2>
+<p class="subtitle">What changes in dental-template — current state vs v2</p>
+
+<div class="split" style="margin-top:24px">
+  <div class="mockup">
+    <div class="mockup-header">Current dental-template</div>
+    <div class="mockup-body" style="font-size:12px;font-family:monospace;line-height:1.8">
+      src/<br>
+      &nbsp;&nbsp;components/ (11 components)<br>
+      &nbsp;&nbsp;layouts/Layout.astro<br>
+      &nbsp;&nbsp;<strong>pages/index.astro</strong> ← single page<br>
+      &nbsp;&nbsp;data/<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;site.json<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;theme.json<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;themes/ (3 presets)
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">v2 dental-template</div>
+    <div class="mockup-body" style="font-size:12px;font-family:monospace;line-height:1.8">
+      src/<br>
+      &nbsp;&nbsp;components/ (11 + RichText + PageTemplate)<br>
+      &nbsp;&nbsp;layouts/Layout.astro<br>
+      &nbsp;&nbsp;pages/<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<strong>index.astro</strong> ← iterates sections.json<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<strong>[...slug].astro</strong> ← dynamic page route<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<strong>admin/index.html</strong> ← TinaCMS editor<br>
+      &nbsp;&nbsp;data/<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;site.json<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;theme.json<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<strong>sections.json</strong><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<strong>menu.json</strong><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<strong>pages/</strong> ← one file per page<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;themes/<br>
+      <strong>tina/config.ts</strong> ← CMS schema<br>
+      <strong>tina/collections/</strong> ← per-collection schemas
+    </div>
+  </div>
+</div>
+
+<div style="display:grid;gap:12px;margin-top:24px">
+
+  <div style="padding:14px 16px;background:rgba(255,255,255,0.06);border-radius:8px;border-left:3px solid #6ee7b7">
+    <div style="font-weight:600;font-size:13px;margin-bottom:4px">index.astro — section iteration</div>
+    <div style="font-size:13px;color:var(--color-muted)">Instead of importing all 11 components statically, reads sections.json and renders only enabled sections in order. Each section component stays unchanged — just how they're composed changes.</div>
+  </div>
+
+  <div style="padding:14px 16px;background:rgba(255,255,255,0.06);border-radius:8px;border-left:3px solid #6ee7b7">
+    <div style="font-weight:600;font-size:13px;margin-bottom:4px">[...slug].astro — dynamic page routing</div>
+    <div style="font-size:13px;color:var(--color-muted)">Reads all files in data/pages/ at build time (getStaticPaths), renders each using the appropriate page template (treatment / info / blank) + the WYSIWYG block if present. This enables unlimited client pages with no template changes needed per page.</div>
+  </div>
+
+  <div style="padding:14px 16px;background:rgba(255,255,255,0.06);border-radius:8px;border-left:3px solid #6ee7b7">
+    <div style="font-weight:600;font-size:13px;margin-bottom:4px">Nav.astro — menu from menu.json</div>
+    <div style="font-size:13px;color:var(--color-muted)">Currently hardcoded nav links. Reads menu.json and renders items dynamically, supporting one level of nested dropdowns. Anchors for home sections (#services, #contact), hrefs for pages (/behandelingen/implantaten).</div>
+  </div>
+
+  <div style="padding:14px 16px;background:rgba(255,255,255,0.06);border-radius:8px;border-left:3px solid #6ee7b7">
+    <div style="font-weight:600;font-size:13px;margin-bottom:4px">RichText.astro — WYSIWYG renderer</div>
+    <div style="font-size:13px;color:var(--color-muted)">New component that renders TinaCMS rich text (stored as JSON) into HTML. Handles headings, paragraphs, bold/italic, images, bullet lists, simple tables. Used in page templates and optionally in section WYSIWYG blocks.</div>
+  </div>
+
+  <div style="padding:14px 16px;background:rgba(255,255,255,0.06);border-radius:8px;border-left:3px solid #93c5fd">
+    <div style="font-weight:600;font-size:13px;margin-bottom:4px">tina/config.ts — CMS schema</div>
+    <div style="font-size:13px;color:var(--color-muted)">Defines all 5 collections (Business, Theme, Sections, Pages, Menu) with their fields, validation, and UI labels in Dutch. This is the most time-intensive piece — needs to cover every editable field across all sections and page templates.</div>
+  </div>
+
+</div>
+
+<div style="margin-top:20px;padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:13px">
+  <strong>Existing 11 section components:</strong> <span style="color:var(--color-muted)">unchanged — they still receive props, just sourced from the new content model instead of a flat site.json import.</span>
+</div>

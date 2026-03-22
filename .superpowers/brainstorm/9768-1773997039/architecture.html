@@ -1,0 +1,72 @@
+<h2>System Architecture</h2>
+<p class="subtitle">How all the pieces connect — operator side, client side, and the build pipeline</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px">
+
+  <!-- Operator side -->
+  <div class="mockup">
+    <div class="mockup-header">Operator (you)</div>
+    <div class="mockup-body" style="font-size:13px">
+      <div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:12px;margin-bottom:12px">
+        <strong>autosite repo</strong><br>
+        <span style="color:var(--color-muted)">dental-template/ (Astro + TinaCMS)<br>build-sites.js (initial build pipeline)<br>qualify-prospects.js (screening)</span>
+      </div>
+      <div style="text-align:center;color:var(--color-muted);font-size:12px">↓ push component update</div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:12px;margin-top:12px">
+        <strong>Trigger script</strong><br>
+        <span style="color:var(--color-muted)">Calls GitHub API → dispatches Action on all client repos → all sites rebuild with updated template</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tina Cloud -->
+  <div class="mockup">
+    <div class="mockup-header">Tina Cloud ($29/mo)</div>
+    <div class="mockup-body" style="font-size:13px">
+      <div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:12px;margin-bottom:8px">
+        <strong>Auth</strong><br>
+        <span style="color:var(--color-muted)">Client logs in with email/password — no GitHub account needed</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:12px">
+        <strong>Git bridge</strong><br>
+        <span style="color:var(--color-muted)">Commits content changes to client's GitHub repo on save</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-client repo -->
+  <div class="mockup">
+    <div class="mockup-header">Per-client GitHub repo (private)</div>
+    <div class="mockup-body" style="font-size:13px">
+      <div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:12px;margin-bottom:8px">
+        <strong>Content files only</strong><br>
+        <span style="color:var(--color-muted)">site.json — business info &amp; section content<br>theme.json — colors, fonts<br>sections.json — order &amp; enabled state<br>pages/ — one file per custom page<br>menu.json — nav structure</span>
+      </div>
+      <div style="text-align:center;color:var(--color-muted);font-size:12px">↓ commit triggers GitHub Action</div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:12px;margin-top:8px">
+        <strong>GitHub Action</strong><br>
+        <span style="color:var(--color-muted)">Clone latest dental-template → inject content files → npm run build → wrangler deploy</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client experience -->
+  <div class="mockup">
+    <div class="mockup-header">Client (dental practice)</div>
+    <div class="mockup-body" style="font-size:13px">
+      <div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:12px;margin-bottom:8px">
+        <strong>TinaCMS editor</strong><br>
+        <span style="color:var(--color-muted)">Opens at tandartspraktijk.nl/admin<br>Visual in-context editing<br>Section drag-and-drop<br>Page builder<br>Menu manager<br>WYSIWYG rich text</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:12px">
+        <strong>Live site</strong><br>
+        <span style="color:var(--color-muted)">tandartspraktijk.pages.dev<br>Rebuilds automatically on save (~2-3 min)</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:24px;padding:16px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:13px">
+  <strong>Key principle:</strong> <span style="color:var(--color-muted)">dental-template stays entirely operator-controlled. Client repos contain only content files. When you update a component, all client sites rebuild automatically — client content is never touched.</span>
+</div>

@@ -1,12 +1,21 @@
 # CMS Directus Phase 1 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **STATUS: COMPLETE as of 2026-03-20. PARKED as of 2026-03-21.** All 9 tasks done and validated. Directus parked — self-hosted Postgres + schema management overkill at current scale. Branch kept for reference. Next: TinaCMS self-hosted with alternative auth.
 
 **Goal:** Deploy a self-hosted Directus instance on Fly.io, define the `site_configs` schema, wire a GitHub Action that fetches content from Directus and deploys to Cloudflare Pages, and validate end-to-end with one demo client.
 
-**Architecture:** Directus on Fly.io (512MB + PostgreSQL) holds client business info and theme settings. A Manual Flow in Directus exposes a Deploy button on each `site_configs` record; clicking it calls `workflow_dispatch` on the `dental-template` GitHub repo. The GitHub Action fetches from Directus, writes `site.json` + `theme.json` into the dental-template checkout, runs `astro build`, and deploys to Cloudflare Pages.
+**Architecture:** Directus on Fly.io (512MB + PostgreSQL) holds client business info and theme settings. A Manual Flow in Directus exposes a Deploy button on each `site_configs` record; clicking it calls `workflow_dispatch` on the `autosite` GitHub repo. The GitHub Action fetches from Directus, writes `site.json` + `theme.json` into the dental-template checkout, runs `astro build`, and deploys to Cloudflare Pages.
 
 **Tech Stack:** Directus v11, Fly.io (flyctl CLI), PostgreSQL, Node.js 20 ESM, GitHub Actions, Wrangler v4, Resend (SMTP), `node:test` (unit tests)
+
+**Deviations from original plan:**
+- Workflow file is at `.github/workflows/deploy.yml` in repo root (not `dental-template/.github/`) — GitHub Actions requires root placement
+- GitHub repo is `masidawoud/autosite` (not a separate `dental-template` repo)
+- Directus v11 permissions API uses policies — `POST /permissions` requires `policy` field not `role` field
+- `setup-permissions.js` created separately from `setup-directus.js` due to Directus v11 API changes
+- Permissions configured via UI (not script) due to terminal issues with multiline commands
+- Deploy Flow uses Run Script → removed; Trigger connects directly to Webhook node
+- `FLOWS_ENV_ALLOW_LIST=DIRECTUS_GITHUB_PAT` must be set for `{{$env.DIRECTUS_GITHUB_PAT}}` to work in flows
 
 ---
 
@@ -25,7 +34,7 @@ All Astro components and `build-sites.js` are untouched.
 
 ---
 
-## Task 1: Fly.io — Deploy PostgreSQL
+## Task 1: Fly.io — Deploy PostgreSQL ✅
 
 **Files:** none (infrastructure only)
 
@@ -62,7 +71,7 @@ Expected: psql prompt. Type `\q` to exit.
 
 ---
 
-## Task 2: Fly.io — Deploy Directus
+## Task 2: Fly.io — Deploy Directus ✅
 
 **Files:** `fly.toml` (created by flyctl, not committed — add to `.gitignore`)
 
@@ -131,7 +140,7 @@ Expected: Directus admin UI loads, shows empty project.
 
 ---
 
-## Task 3: Directus — Apply Schema via Script
+## Task 3: Directus — Apply Schema via Script ✅
 
 **Files:** `dental-template/scripts/setup-directus.js`
 
@@ -292,7 +301,7 @@ git commit -m "feat: add Directus schema setup script"
 
 ---
 
-## Task 4: SMTP — Configure Resend
+## Task 4: SMTP — Configure Resend ✅
 
 **Files:** none (Fly.io secrets only)
 
@@ -334,7 +343,7 @@ Expected: receive invite email within 1 minute.
 
 ---
 
-## Task 5: Content Transform — TDD
+## Task 5: Content Transform — TDD ✅
 
 **Files:**
 - Create: `dental-template/scripts/content-transform.js`
@@ -558,7 +567,7 @@ git commit -m "feat: add content transform functions with tests"
 
 ---
 
-## Task 6: fetch-content.js — CLI Entry Point
+## Task 6: fetch-content.js — CLI Entry Point ✅
 
 **Files:**
 - Create: `dental-template/scripts/fetch-content.js`
@@ -670,7 +679,7 @@ git commit -m "feat: add fetch-content CLI script"
 
 ---
 
-## Task 7: GitHub Action — deploy.yml
+## Task 7: GitHub Action — deploy.yml ✅
 
 **Files:**
 - Create: `dental-template/.github/workflows/deploy.yml`
@@ -760,7 +769,7 @@ Open the URL and verify `business.name` shows "Test Lokaal".
 
 ---
 
-## Task 8: Directus Deploy Flow
+## Task 8: Directus Deploy Flow ✅
 
 **Files:** none (Directus UI configuration only)
 
@@ -842,7 +851,7 @@ Expected:
 
 ---
 
-## Task 9: End-to-End Demo Client
+## Task 9: End-to-End Demo Client ✅
 
 **Files:** none
 

@@ -1,0 +1,90 @@
+<h2>CMS Approach Options</h2>
+<p class="subtitle">Three directions — each with a different trade-off between cost, build effort, and client UX</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Decap CMS + GitHub repos</h3>
+      <p><strong>How it works:</strong> Each client gets a GitHub repo containing their <code>site.json</code>, <code>theme.json</code>, <code>sections.json</code>. Decap CMS (open source) sits on top and edits those files via a web UI. On save → GitHub Action clones latest <code>dental-template</code> → Astro build → Cloudflare Pages deploy.</p>
+      <br>
+      <p><strong>What you get:</strong> Form-based editing for structured content (opening hours, team members, services). Markdown editor for WYSIWYG blocks. Drag-and-drop section ordering via list widget. Menu structure via nested list widget.</p>
+      <br>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Free — no platform cost</li>
+          <li>Fits planned architecture exactly</li>
+          <li>Template updates push to all clients via one script</li>
+          <li>Content lives in git — full history</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Decap UI is dated and form-heavy</li>
+          <li>WYSIWYG is markdown-only (no visual block editor)</li>
+          <li>GitHub account required per client (or OAuth app setup)</li>
+          <li>Section drag-and-drop is clunky in Decap</li>
+        </ul></div>
+      </div>
+      <br>
+      <p><strong>Cost:</strong> €0/month infrastructure. GitHub free tier. Cloudflare Pages free tier.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>TinaCMS (self-hosted)</h3>
+      <p><strong>How it works:</strong> TinaCMS is a git-backed CMS with visual in-context editing — clients see their actual site in the browser and click to edit text, images, reorder sections. Content still saved to files in a per-client GitHub repo. Same build pipeline as option A.</p>
+      <br>
+      <p><strong>What you get:</strong> Visual editing directly on the rendered page. Rich text editor (not just markdown). Drag-and-drop section ordering. Page builder with predefined blocks. Self-hostable backend (TinaCMS server).</p>
+      <br>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Best client UX — edit in context on real site</li>
+          <li>Git-backed — same architecture direction</li>
+          <li>Rich text is first-class (not just markdown)</li>
+          <li>Self-hostable = no per-client cost</li>
+          <li>Astro integration exists</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Requires hosting the TinaCMS server yourself</li>
+          <li>More complex setup per client</li>
+          <li>Younger project, smaller community than Decap</li>
+          <li>Visual editing requires site to be running (preview server)</li>
+        </ul></div>
+      </div>
+      <br>
+      <p><strong>Cost:</strong> Server hosting ~€5–10/month flat (shared across all clients). TinaCMS Cloud: free up to 2 users/site.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Sanity (hosted headless CMS)</h3>
+      <p><strong>How it works:</strong> Each client gets a Sanity dataset (project). Sanity Studio is the editing UI — a polished React app hosted by Sanity. Content is stored in Sanity's cloud. On publish → webhook → GitHub Action → Astro fetches content from Sanity API → build → Cloudflare Pages deploy.</p>
+      <br>
+      <p><strong>What you get:</strong> Best-in-class rich text (Portable Text — real block editor, not markdown). Native drag-and-drop arrays for sections. Schema-driven — you define exactly what clients can edit. Polished, professional UI that feels like a real product.</p>
+      <br>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Best WYSIWYG and editing experience</li>
+          <li>Most mature, best-supported platform</li>
+          <li>Schema-driven = precise control over what clients can touch</li>
+          <li>No server to host yourself</li>
+          <li>Built-in image handling (CDN, transforms)</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>€15–20/project/month at scale</li>
+          <li>Content leaves git — no file-based history</li>
+          <li>Astro integration requires rewriting data layer (away from JSON files)</li>
+          <li>Harder to push template updates — data model changes need migration</li>
+          <li>Vendor dependency</li>
+        </ul></div>
+      </div>
+      <br>
+      <p><strong>Cost:</strong> Free for 3 projects. €15/project/month after. 50 clients = €750/month.</p>
+    </div>
+  </div>
+
+</div>

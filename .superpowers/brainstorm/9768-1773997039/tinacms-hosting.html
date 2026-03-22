@@ -1,0 +1,115 @@
+<h2>TinaCMS: Cloud vs Self-Hosted</h2>
+<p class="subtitle">Two ways to run TinaCMS — different trade-offs on cost, complexity, and control</p>
+
+<div class="options">
+
+  <div class="option" data-choice="cloud" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Tina Cloud (hosted)</h3>
+      <p>Tina manages the backend — authentication, git operations, content indexing. You just embed TinaCMS in the Astro site and point it at Tina Cloud. No server to run.</p>
+      <br>
+      <div class="section">
+        <span class="label">How it works</span>
+        <div class="mockup" style="margin-top:8px">
+          <div class="mockup-header">Flow per client</div>
+          <div class="mockup-body" style="font-size:13px;line-height:2">
+            Client logs in via Tina Cloud (email/password) →<br>
+            Edits content in TinaCMS editor embedded in their site →<br>
+            Tina Cloud commits changes to client's GitHub repo →<br>
+            GitHub Action triggers → Astro build → Cloudflare Pages
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>No server to manage</li>
+          <li>Auth handled out of the box</li>
+          <li>Fastest to get running</li>
+          <li>Scales without effort</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>$29/month (Starter: 2 users, unlimited sites)</li>
+          <li>Vendor dependency for auth + git ops</li>
+          <li>Less control over user management</li>
+        </ul></div>
+      </div>
+      <br>
+      <p><strong>Cost:</strong> $29/month flat for all clients (2 users per site). Scales well — same price for 5 or 50 clients.</p>
+      <p><strong>Added complexity vs current setup:</strong> Medium — schema definition, template changes, GitHub Action per client. No new infrastructure.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="selfhosted" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Self-Hosted TinaCMS</h3>
+      <p>You run the TinaCMS backend on your own server (a small Node.js process). Handles auth and git operations yourself. TinaCMS open source packages do the heavy lifting — you just configure and deploy.</p>
+      <br>
+      <div class="section">
+        <span class="label">How it works</span>
+        <div class="mockup" style="margin-top:8px">
+          <div class="mockup-header">Flow per client</div>
+          <div class="mockup-body" style="font-size:13px;line-height:2">
+            Client logs in via your auth (NextAuth / custom) →<br>
+            Edits content in TinaCMS editor →<br>
+            Your TinaCMS server commits to client's GitHub repo →<br>
+            GitHub Action triggers → Astro build → Cloudflare Pages
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>No platform cost — ~€5–10/month VPS</li>
+          <li>Full control over auth and user management</li>
+          <li>One server handles all clients</li>
+          <li>Foundation for future admin panel</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>You manage the server (uptime, updates)</li>
+          <li>Auth setup is non-trivial</li>
+          <li>More moving parts to debug</li>
+          <li>TinaCMS self-hosted docs are thinner</li>
+        </ul></div>
+      </div>
+      <br>
+      <p><strong>Cost:</strong> €5–10/month VPS flat. No per-client cost.</p>
+      <p><strong>Added complexity vs current setup:</strong> High — server setup, auth system, per-client configuration, ongoing ops.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="margin-top:32px;padding:20px;background:rgba(255,255,255,0.05);border-radius:8px">
+  <h3>What TinaCMS adds to the project regardless of hosting</h3>
+  <p class="subtitle">This work is the same whichever path you choose</p>
+  <br>
+  <table style="width:100%;border-collapse:collapse;font-size:14px">
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+      <td style="padding:8px 12px;font-weight:600">TinaCMS schema</td>
+      <td style="padding:8px 12px;color:var(--color-muted)">Define all editable fields: hero, services, team, hours, sections, pages, menu. One-time, but thorough.</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+      <td style="padding:8px 12px;font-weight:600">Multi-page Astro routing</td>
+      <td style="padding:8px 12px;color:var(--color-muted)">Currently a single index.astro. Need dynamic routes for treatment/info pages. Significant template change.</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+      <td style="padding:8px 12px;font-weight:600">Section ordering</td>
+      <td style="padding:8px 12px;color:var(--color-muted)">Implement sections.json iteration in index.astro (planned but not built).</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+      <td style="padding:8px 12px;font-weight:600">WYSIWYG block rendering</td>
+      <td style="padding:8px 12px;color:var(--color-muted)">Rich text renderer for freeform content blocks (images, tables, headings).</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+      <td style="padding:8px 12px;font-weight:600">Menu management</td>
+      <td style="padding:8px 12px;color:var(--color-muted)">Nav component needs to render from CMS-managed structure with nesting support.</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;font-weight:600">Per-client GitHub repo + Action</td>
+      <td style="padding:8px 12px;color:var(--color-muted)">Each client needs their own repo. GitHub Action clones dental-template, injects content, builds, deploys.</td>
+    </tr>
+  </table>
+</div>

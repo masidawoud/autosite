@@ -1,5 +1,7 @@
 # CMS — TinaCMS Design Spec
 
+> ⚠️ **ABANDONED (2026-03-20), ACTIVE SPIKE (2026-03-21)** — Tina Cloud requires GitHub accounts (dealbreaker). Now being implemented as TinaCMS self-hosted with email/password auth via `tinacms-authjs` (`UsernamePasswordAuthJSProvider`) — no GitHub account required for clients. Backend runs as a separate Node.js service on Fly.io; static Astro site stays on Cloudflare Pages. Directus was built as replacement but parked on 2026-03-21 — self-hosted Postgres + schema management overkill at current scale. Implementation plan: `docs/superpowers/plans/2026-03-21-cms-tinacms-authjs.md`.
+
 ## What we're building
 
 A self-serve CMS for dental practice clients. Clients log in at their site's `/admin` route and can edit content, reorder sections, add new pages, manage navigation, and insert WYSIWYG content — without touching code or GitHub.

@@ -1,5 +1,7 @@
 # TinaCMS Phase 1 — Trial Spike Implementation Plan
 
+> ⚠️ **ABANDONED (2026-03-20), RE-EVALUATING (2026-03-21)** — Tina Cloud requires GitHub accounts (dealbreaker). Being reconsidered as TinaCMS self-hosted + alternative auth (Netlify Identity or similar) so clients use email/password only. Directus was built as replacement but parked on 2026-03-21 — self-hosted Postgres + schema management deemed overkill. The `feature/tinacms` branch is kept for reference.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Integrate TinaCMS into `dental-template` on a `feature/tinacms` branch, wire a demo client repo + GitHub Action end-to-end, and validate the full edit → commit → build → deploy flow using a minimal schema (business info + hero only).
