@@ -1,0 +1,282 @@
+backend:
+  name: gitea
+  repo: operator/client-{id}
+  base_url: https://gitea.autosite.nl
+  api_root: https://gitea.autosite.nl/api/v1
+  app_id: <operator-oauth-app-client-id>
+
+media_folder: public/images
+public_folder: /images
+
+collections:
+
+  # ─── Site content (single entry — all site.json fields) ───────────────────
+  - name: site
+    label: Site-inhoud
+    files:
+      - name: site
+        label: Site-inhoud
+        file: site.json
+        fields:
+          - name: business
+            label: Praktijkgegevens
+            widget: object
+            fields:
+              - { name: name,        label: Praktijknaam,   widget: string }
+              - { name: address,     label: Adres,          widget: string }
+              - { name: postal_code, label: Postcode,       widget: string }
+              - { name: city,        label: Stad,           widget: string }
+              - { name: phone,       label: Telefoonnummer, widget: string }
+              - { name: email,       label: E-mailadres,    widget: string }
+
+          - name: nav
+            label: Navigatie
+            widget: object
+            fields:
+              - name: links
+                label: Menupunten
+                widget: list
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: href,  label: Link,  widget: string }
+
+          - name: hero
+            label: Hero
+            widget: object
+            fields:
+              - { name: eyebrow,       label: Eyebrow,        widget: string }
+              - { name: headline,      label: Koptekst,       widget: string }
+              - { name: description,   label: Omschrijving,   widget: text   }
+              - { name: cta_primary,   label: Knop primair,   widget: string }
+              - { name: cta_secondary, label: Knop secundair, widget: string }
+              - { name: image_url,     label: Afbeelding URL, widget: string }
+
+          - name: quote
+            label: Quote
+            widget: object
+            fields:
+              - { name: text,        label: Tekst,   widget: text   }
+              - { name: author_name, label: Naam,    widget: string }
+              - { name: author_role, label: Functie, widget: string }
+
+          - name: features
+            label: Kenmerken
+            widget: object
+            fields:
+              - { name: eyebrow,   label: Eyebrow,    widget: string }
+              - { name: title,     label: Titel,      widget: string }
+              - { name: subtitle,  label: Subtitel,   widget: string }
+              - { name: image_url, label: Afbeelding, widget: string }
+              - name: items
+                label: Kenmerken
+                widget: list
+                fields:
+                  - { name: icon,  label: Icoon,        widget: string }
+                  - { name: title, label: Titel,        widget: string }
+                  - { name: desc,  label: Omschrijving, widget: text   }
+
+          - name: services
+            label: Diensten
+            widget: object
+            fields:
+              - { name: eyebrow,  label: Eyebrow,  widget: string }
+              - { name: title,    label: Titel,    widget: string }
+              - { name: subtitle, label: Subtitel, widget: string }
+              - name: items
+                label: Diensten
+                widget: list
+                fields:
+                  - { name: tag,       label: Label,        widget: string }
+                  - { name: title,     label: Titel,        widget: string }
+                  - { name: desc,      label: Omschrijving, widget: text   }
+                  - { name: image_url, label: Afbeelding,   widget: string }
+                  - { name: items,     label: Bullets,      widget: list, field: { name: item, widget: string } }
+                  - { name: cta,       label: Knoptekst,    widget: string }
+
+          - name: team
+            label: Team
+            widget: object
+            fields:
+              - { name: eyebrow,  label: Eyebrow,  widget: string }
+              - { name: title,    label: Titel,    widget: string }
+              - { name: subtitle, label: Subtitel, widget: string }
+              - name: members
+                label: Teamleden
+                widget: list
+                fields:
+                  - { name: name,      label: Naam,     widget: string }
+                  - { name: role,      label: Functie,  widget: string }
+                  - { name: bio,       label: Bio,      widget: text   }
+                  - { name: image_url, label: Foto URL, widget: string }
+
+          - name: reviews
+            label: Reviews
+            widget: object
+            fields:
+              - { name: title,    label: Titel,    widget: string }
+              - { name: subtitle, label: Subtitel, widget: string }
+              - name: items
+                label: Reviews
+                widget: list
+                fields:
+                  - { name: name,  label: Naam,    widget: string }
+                  - { name: stars, label: Sterren, widget: number, min: 1, max: 5 }
+                  - { name: date,  label: Datum,   widget: string }
+                  - { name: text,  label: Tekst,   widget: text   }
+
+          - name: hours
+            label: Openingstijden
+            widget: object
+            fields:
+              - name: items
+                label: Dagen
+                widget: list
+                fields:
+                  - { name: day,  label: Dag,  widget: string  }
+                  - { name: time, label: Tijd, widget: string  }
+                  - { name: open, label: Open, widget: boolean }
+
+          - name: vergoeding
+            label: Vergoeding
+            widget: object
+            fields:
+              - { name: eyebrow, label: Eyebrow, widget: string }
+              - { name: title,   label: Titel,   widget: string }
+              - { name: intro,   label: Intro,   widget: text   }
+              - name: blocks
+                label: Tekstblokken
+                widget: list
+                fields:
+                  - { name: title, label: Titel, widget: string }
+                  - { name: text,  label: Tekst, widget: text   }
+              - name: insurers
+                label: Verzekeraars
+                widget: list
+                field: { name: name, widget: string }
+              - { name: cta, label: CTA-tekst, widget: string }
+
+          - name: contact
+            label: Contact
+            widget: object
+            fields:
+              - { name: eyebrow, label: Eyebrow,      widget: string }
+              - { name: title,   label: Titel,        widget: string }
+              - { name: intro,   label: Omschrijving, widget: text   }
+
+          - name: contact_form
+            label: Contactformulier
+            widget: object
+            fields:
+              - { name: recipient_email,      label: Ontvanger e-mail,    widget: string }
+              - { name: confirmation_message, label: Bevestigingsbericht, widget: string }
+
+          - name: footer
+            label: Footer
+            widget: object
+            fields:
+              - { name: tagline, label: Tagline, widget: string }
+              - name: social
+                label: Sociale media
+                widget: list
+                fields:
+                  - name: platform
+                    label: Platform
+                    widget: select
+                    options: [facebook, instagram, linkedin, twitter, youtube]
+                  - { name: url, label: URL, widget: string }
+
+  # ─── Sections order & visibility ──────────────────────────────────────────
+  - name: sections
+    label: Secties
+    files:
+      - name: sections
+        label: Sectievolgorde & zichtbaarheid
+        file: sections.json
+        fields:
+          - name: pages
+            label: Pagina's
+            widget: object
+            fields:
+              - name: home
+                label: Homepagina
+                widget: list
+                fields:
+                  - name: id
+                    label: Sectie-ID
+                    widget: string
+                  - { name: enabled, label: Actief, widget: boolean }
+
+  # ─── Optional sections (own files) ────────────────────────────────────────
+  - name: optional_sections
+    label: Optionele secties
+    files:
+      - name: faq
+        label: FAQ
+        file: faq.json
+        fields:
+          - { name: eyebrow, label: Eyebrow, widget: string }
+          - { name: title,   label: Titel,   widget: string }
+          - name: items
+            label: Vragen
+            widget: list
+            fields:
+              - { name: question, label: Vraag,    widget: string }
+              - { name: answer,   label: Antwoord, widget: text   }
+
+      - name: gallery
+        label: Galerij
+        file: gallery.json
+        fields:
+          - { name: eyebrow, label: Eyebrow, widget: string }
+          - { name: title,   label: Titel,   widget: string }
+          - name: items
+            label: Foto's
+            widget: list
+            fields:
+              - { name: image_url, label: Afbeelding, widget: string }
+              - { name: caption,   label: Bijschrift,  widget: string }
+
+      - name: before_after
+        label: Voor & Na
+        file: before_after.json
+        fields:
+          - { name: eyebrow, label: Eyebrow, widget: string }
+          - { name: title,   label: Titel,   widget: string }
+          - name: items
+            label: Resultaten
+            widget: list
+            fields:
+              - { name: before_url,  label: Voor-foto,    widget: string }
+              - { name: after_url,   label: Na-foto,      widget: string }
+              - { name: description, label: Omschrijving, widget: text   }
+
+      - name: map
+        label: Kaart
+        file: map.json
+        fields:
+          - { name: title,     label: Titel,      widget: string }
+          - { name: embed_url, label: Embed URL,  widget: string }
+          - { name: label,     label: Adreslabel, widget: string }
+
+      - name: emergency
+        label: Spoedmelding
+        file: emergency.json
+        fields:
+          - { name: text,    label: Tekst,     widget: string  }
+          - { name: phone,   label: Telefoon,  widget: string  }
+          - { name: enabled, label: Zichtbaar, widget: boolean }
+
+      - name: pricing
+        label: Tarieven
+        file: pricing.json
+        fields:
+          - { name: eyebrow,    label: Eyebrow,    widget: string }
+          - { name: title,      label: Titel,      widget: string }
+          - { name: disclaimer, label: Disclaimer, widget: string }
+          - name: items
+            label: Behandelingen
+            widget: list
+            fields:
+              - { name: treatment, label: Behandeling, widget: string }
+              - { name: price,     label: Tarief,      widget: string }
+              - { name: notes,     label: Opmerkingen, widget: string }
