@@ -1,18 +1,42 @@
 # Full CMS Integration Implementation Plan
 
+**STATUS: IN REVIEW** — Implementation complete but architecture diverged significantly from original plan. User is testing locally and providing UX feedback. More changes expected.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Extend dental-template with 6 new section components, dynamic section rendering, client-editable Nav/Footer, full Sveltia CMS config.yml, and build-sites.js provisioning for all new data files.
 
-**Architecture:** `index.astro` is refactored from a hardcoded component list to a data-driven renderer that reads `sections.json` to determine order and visibility. Six new JSON files (one per optional section) live in `src/data/`. `Nav.astro` and `Footer.astro` accept new props from updated `site.json` fields. `build-sites.js` writes placeholder copies of all new JSON files to each build directory.
-
-**Tech Stack:** Astro 4.x, Sveltia CMS, Gitea (backend), Cloudflare Pages, Node.js ESM
-
 **Spec:** `docs/superpowers/specs/2026-03-22-cms-full-integration-design.md`
 
-**Decision points reserved for human review** (do not resolve autonomously):
-1. Sveltia `sections.json` panel — whether list item `id` field can be read-only (see Task 12 validation note)
-2. Google Maps embed URL provisioning — whether to default to OpenStreetMap or leave blank (see Task 1)
+---
+
+## Architecture as implemented (diverged from original plan)
+
+The original plan used `sections.json` + separate JSON files per section. The actual implementation uses a different, cleaner architecture:
+
+- **All page content** lives in `src/content/pages/*.md` with JSON frontmatter (Astro content collections)
+- **Config split** into 5 separate files: `business.json`, `nav.json`, `contact_form.json`, `footer.json`, `emergency.json`
+- **CMS has 2 collections:** Instellingen (5 file entries) + Pagina's (folder, create:true, delete:false)
+- **Every page** shares the same schema: sections (14 typed types incl. richtext) + SEO fields
+- **Nav links** use typed list (Pagina relation widget OR Aangepaste URL)
+- **Richtext** is a section type (Tekstblok), not a default page field
+- `index.astro` reads home via `getEntry('pages', 'home')`; `[slug].astro` renders all other pages
+- `build-sites.js` writes 5 config files + `src/content/pages/home.md` with JSON frontmatter
+
+## Open questions from review
+
+1. **Deploy button** — every CMS save = Gitea commit = CF Pages deploy. User wants to batch edits and deploy once. Options:
+   - `publish_mode: editorial_workflow` (Sveltia support TBD — needs investigation)
+   - Custom deploy button via CF Pages API injected into admin/index.html
+   - Scheduled CF Pages deploys
+
+2. **UX feedback ongoing** — more changes expected next session
+
+## Known CMS hacks (admin/index.html)
+
+MutationObserver script hides:
+- Bulk delete button (text === 'Delete')
+- Selection checkboxes when not in entry editor (list view only)
 
 ---
 
