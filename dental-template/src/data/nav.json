@@ -1,0 +1,8 @@
+{
+  "links": [
+    { "label": "Diensten",   "href": "#diensten"   },
+    { "label": "Team",       "href": "#over-ons"   },
+    { "label": "Vergoeding", "href": "#vergoeding" },
+    { "label": "Contact",    "href": "#contact"    }
+  ]
+}

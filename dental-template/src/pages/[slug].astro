@@ -1,6 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
-import config from '../data/config.json';
+import business    from '../data/business.json';
+import nav         from '../data/nav.json';
+import footer      from '../data/footer.json';
+import emergency   from '../data/emergency.json';
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
@@ -15,6 +18,7 @@ import OpeningHours from '../components/OpeningHours.astro';
 import Vergoeding from '../components/Vergoeding.astro';
 import Contact from '../components/Contact.astro';
 import Map from '../components/Map.astro';
+import RichText from '../components/RichText.astro';
 
 export async function getStaticPaths() {
   const pages = await getCollection('pages', p =>
@@ -33,29 +37,27 @@ const title       = page.data.seo_title || page.data.title;
 const description = page.data.seo_description || '';
 ---
 
-<Layout title={`${title} — ${config.business.name}`} description={description}>
-  <Nav business={config.business} nav={config.nav} />
-  {config.emergency.enabled && <EmergencyBanner data={config.emergency} />}
+<Layout title={`${title} — ${business.name}`} description={description}>
+  <Nav business={business} nav={nav} />
+  {emergency.enabled && <EmergencyBanner data={emergency} />}
   <main>
     {sections.map((s: any) => {
-      if (s.type === 'hero')       return <Hero data={s} business={config.business} />;
+      if (s.type === 'hero')       return <Hero data={s} business={business} />;
       if (s.type === 'quote')      return <Quote data={s} />;
       if (s.type === 'features')   return <Features data={s} />;
       if (s.type === 'services')   return <Services data={s} />;
       if (s.type === 'team')       return <About data={s} />;
       if (s.type === 'reviews')    return <Reviews data={s} />;
-      if (s.type === 'hours')      return <OpeningHours data={s} business={config.business} />;
+      if (s.type === 'hours')      return <OpeningHours data={s} business={business} />;
       if (s.type === 'vergoeding') return <Vergoeding data={s} />;
-      if (s.type === 'contact')    return <Contact data={s} business={config.business} />;
+      if (s.type === 'contact')    return <Contact data={s} business={business} />;
       if (s.type === 'map')        return <Map data={s} />;
+      if (s.type === 'richtext')   return <RichText data={s} />;
       return null;
     })}
-    {sections.length > 0 && <div class="page-body-divider" />}
-    <div class="page-body container container--narrow">
-      <Content />
-    </div>
+    {page.body && <div class="page-body container container--narrow"><Content /></div>}
   </main>
-  <Footer business={config.business} footer={config.footer} />
+  <Footer business={business} footer={footer} />
 </Layout>
 
 <style>

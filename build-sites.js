@@ -171,17 +171,23 @@ function buildCmsDefaults(prospect) {
 // ── Dummy data (no API) ───────────────────────────────────────────────────────
 
 function buildDummyConfig(prospect) {
-  const template = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/config.json'), 'utf-8'));
-  template.meta.title       = `${prospect.business_name} – ${prospect.city}`;
-  template.meta.description = `Tandartspraktijk in ${prospect.city}. Professionele zorg voor uw gebit.`;
-  template.business.name        = prospect.business_name;
-  template.business.city        = prospect.city;
-  template.business.address     = prospect.address;
-  template.business.postal_code = prospect.postal_code;
-  template.business.phone       = prospect.phone;
-  template.business.email       = prospect.email;
-  template.contact_form.recipient_email = (prospect.form_recipient_email || prospect.email || '').trim();
-  return template;
+  const business     = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/business.json'),     'utf-8'));
+  const nav          = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/nav.json'),          'utf-8'));
+  const contactForm  = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/contact_form.json'), 'utf-8'));
+  const footer       = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/footer.json'),       'utf-8'));
+  const emergency    = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/emergency.json'),    'utf-8'));
+
+  business.name        = prospect.business_name;
+  business.city        = prospect.city;
+  business.address     = prospect.address;
+  business.postal_code = prospect.postal_code;
+  business.phone       = prospect.phone;
+  business.email       = prospect.email;
+  footer.meta_title       = `${prospect.business_name} – ${prospect.city}`;
+  footer.meta_description = `Tandartspraktijk in ${prospect.city}. Professionele zorg voor uw gebit.`;
+  contactForm.recipient_email = (prospect.form_recipient_email || prospect.email || '').trim();
+
+  return { business, nav, contactForm, footer, emergency };
 }
 
 function buildDummyHomePage(prospect) {
@@ -517,24 +523,27 @@ async function main() {
         console.log(`    ✓ Using existing build at builds/${prospect.id}/dist`);
       } else {
         // 1. Generate site content
-        let configJson, homeJson;
+        let configFiles, homeJson;
         if (dummy) {
-          configJson = buildDummyConfig(prospect);
-          homeJson   = buildDummyHomePage(prospect);
+          configFiles = buildDummyConfig(prospect);
+          homeJson    = buildDummyHomePage(prospect);
           console.log('    ✓ Dummy content ready');
         } else {
           console.log('    ⟳ Generating content...');
           const siteJson = await generateSiteJson(client, prospect);
-          // Split Groq output (old site.json format) into config.json + pages/home.json
           const recipientEmail = (prospect.form_recipient_email || prospect.email || '').trim();
-          configJson = {
-            meta:     siteJson.meta,
+          configFiles = {
             business: siteJson.business,
-            nav:      siteJson.nav ?? buildCmsDefaults(prospect).nav,
-            footer:   { ...(siteJson.footer ?? {}), social: [] },
-            contact_form: {
+            nav:      siteJson.nav ?? { links: [] },
+            contactForm: {
               recipient_email:      recipientEmail,
               confirmation_message: 'Bedankt! Wij nemen binnen één werkdag contact op.',
+            },
+            footer: {
+              meta_title:       siteJson.meta?.title       ?? `${prospect.business_name} – ${prospect.city}`,
+              meta_description: siteJson.meta?.description ?? '',
+              tagline:          siteJson.footer?.tagline   ?? '',
+              social:           [],
             },
             emergency: {
               text:    'Spoedeisende tandheelkundige hulp nodig? Wij staan voor u klaar.',
@@ -575,8 +584,12 @@ async function main() {
 
         // 4. Write data files
         fs.mkdirSync(path.join(buildDir, 'src/content/pages'), { recursive: true });
-        fs.writeFileSync(path.join(buildDir, 'src/data/config.json'), JSON.stringify(configJson, null, 2));
-        fs.writeFileSync(path.join(buildDir, 'src/data/theme.json'),  JSON.stringify(themeJson,  null, 2));
+        fs.writeFileSync(path.join(buildDir, 'src/data/business.json'),     JSON.stringify(configFiles.business,    null, 2));
+        fs.writeFileSync(path.join(buildDir, 'src/data/nav.json'),          JSON.stringify(configFiles.nav,         null, 2));
+        fs.writeFileSync(path.join(buildDir, 'src/data/contact_form.json'), JSON.stringify(configFiles.contactForm, null, 2));
+        fs.writeFileSync(path.join(buildDir, 'src/data/footer.json'),       JSON.stringify(configFiles.footer,      null, 2));
+        fs.writeFileSync(path.join(buildDir, 'src/data/emergency.json'),    JSON.stringify(configFiles.emergency,   null, 2));
+        fs.writeFileSync(path.join(buildDir, 'src/data/theme.json'),        JSON.stringify(themeJson,               null, 2));
         // Write home page as markdown with JSON frontmatter
         const homeFrontmatter = JSON.stringify({ title: homeJson.title || 'Home', published: true, sections: homeJson.sections }, null, 2);
         fs.writeFileSync(path.join(buildDir, 'src/content/pages/home.md'), `---\n${homeFrontmatter}\n---\n`);
