@@ -203,7 +203,20 @@
     "title": "Plan uw afspraak",
     "intro": "Maak een afspraak via het formulier, bel ons, of stuur een e-mail. Wij reageren altijd binnen één werkdag."
   },
+  "nav": {
+    "links": [
+      { "label": "Diensten",   "href": "#diensten"   },
+      { "label": "Team",       "href": "#over-ons"   },
+      { "label": "Vergoeding", "href": "#vergoeding" },
+      { "label": "Contact",    "href": "#contact"    }
+    ]
+  },
   "footer": {
-    "tagline": "Tandheelkunde die goed voelt."
+    "tagline": "Tandheelkunde die goed voelt.",
+    "social": []
+  },
+  "contact_form": {
+    "recipient_email": "",
+    "confirmation_message": "Bedankt! Wij nemen binnen één werkdag contact op."
   }
 }
