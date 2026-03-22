@@ -1,8 +1,8 @@
 {
   "links": [
-    { "label": "Diensten",   "href": "#diensten"   },
-    { "label": "Team",       "href": "#over-ons"   },
-    { "label": "Vergoeding", "href": "#vergoeding" },
-    { "label": "Contact",    "href": "#contact"    }
+    { "type": "custom_link", "label": "Diensten",   "href": "#diensten"   },
+    { "type": "custom_link", "label": "Team",       "href": "#over-ons"   },
+    { "type": "custom_link", "label": "Vergoeding", "href": "#vergoeding" },
+    { "type": "custom_link", "label": "Contact",    "href": "#contact"    }
   ]
 }

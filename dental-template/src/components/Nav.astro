@@ -5,12 +5,13 @@ interface Props {
     phone: string;
   };
   nav: {
-    links: Array<{ label: string; href?: string; page?: string }>;
+    links: Array<{ type: string; label: string; href?: string; page?: string }>;
   };
 }
 const { business, nav } = Astro.props;
-function resolveHref(link: { href?: string; page?: string }) {
-  if (link.page) return link.page === 'home' ? '/' : `/${link.page}`;
+function resolveHref(link: { type: string; href?: string; page?: string }) {
+  if (link.type === 'page_link' && link.page)
+    return link.page === 'home' ? '/' : `/${link.page}`;
   return link.href ?? '#';
 }
 ---

@@ -42,20 +42,27 @@ collections:
           - name: links
             label: Menupunten
             widget: list
-            fields:
-              - { name: label, label: Linktekst, widget: string }
-              - name: page
-                label: Pagina (selecteer)
-                widget: relation
-                collection: pages
-                search_fields: [title]
-                value_field: '{{slug}}'
-                display_fields: [title]
-                required: false
-              - name: href
-                label: Aangepaste URL (bijv. #contact)
-                widget: string
-                required: false
+            types:
+              - name: page_link
+                label: Pagina
+                widget: object
+                summary: '{{fields.label}}'
+                fields:
+                  - { name: label, label: Linktekst, widget: string }
+                  - name: page
+                    label: Pagina
+                    widget: relation
+                    collection: pages
+                    search_fields: [title]
+                    value_field: '{{slug}}'
+                    display_fields: [title]
+              - name: custom_link
+                label: Aangepaste URL
+                widget: object
+                summary: '{{fields.label}}'
+                fields:
+                  - { name: label, label: Linktekst, widget: string }
+                  - { name: href,  label: URL (bijv. #contact), widget: string }
 
       - name: header_footer
         label: Header & Footer
