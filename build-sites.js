@@ -147,6 +147,27 @@ function cloneTemplate(targetDir) {
   }
 }
 
+// ── CMS defaults ──────────────────────────────────────────────────────────────
+
+function buildCmsDefaults(prospect) {
+  const recipientEmail = (prospect.form_recipient_email || prospect.email || '').trim();
+  return {
+    nav: {
+      links: [
+        { label: 'Diensten',   href: '#diensten'   },
+        { label: 'Team',       href: '#over-ons'   },
+        { label: 'Vergoeding', href: '#vergoeding' },
+        { label: 'Contact',    href: '#contact'    },
+      ],
+    },
+    footer_social: [],
+    contact_form: {
+      recipient_email: recipientEmail,
+      confirmation_message: 'Bedankt! Wij nemen binnen één werkdag contact op.',
+    },
+  };
+}
+
 // ── Dummy site.json (no API) ──────────────────────────────────────────────────
 
 function buildDummySiteJson(prospect) {
@@ -161,6 +182,7 @@ function buildDummySiteJson(prospect) {
   template.business.email        = prospect.email;
   template.hero.eyebrow   = `Tandarts ${prospect.city}`;
   template.hero.image_url = 'https://picsum.photos/seed/dental-hero/720/860';
+  template.contact_form.recipient_email = (prospect.form_recipient_email || prospect.email || '').trim();
   return template;
 }
 
@@ -491,6 +513,11 @@ async function main() {
         } else {
           console.log('    ⟳ Generating content...');
           siteJson = await generateSiteJson(client, prospect);
+          // Merge CMS fields that Groq does not generate
+          const cms = buildCmsDefaults(prospect);
+          siteJson.nav          = cms.nav;
+          siteJson.contact_form = cms.contact_form;
+          siteJson.footer       = { ...(siteJson.footer ?? {}), social: cms.footer_social };
           console.log('    ✓ Content generated');
         }
 
@@ -506,6 +533,23 @@ async function main() {
         // 4. Write data files
         fs.writeFileSync(path.join(buildDir, 'src/data/site.json'),  JSON.stringify(siteJson,  null, 2));
         fs.writeFileSync(path.join(buildDir, 'src/data/theme.json'), JSON.stringify(themeJson, null, 2));
+
+        // Write new optional-section placeholder files (read from template)
+        const NEW_DATA_FILES = [
+          'sections.json',
+          'faq.json',
+          'gallery.json',
+          'before_after.json',
+          'map.json',
+          'emergency.json',
+          'pricing.json',
+        ];
+        for (const filename of NEW_DATA_FILES) {
+          const src  = path.join(TEMPLATE_DIR, 'src/data', filename);
+          const dest = path.join(buildDir, 'src/data', filename);
+          fs.copyFileSync(src, dest);
+        }
+
         console.log('    ✓ Data files written');
 
         // 5. Build
