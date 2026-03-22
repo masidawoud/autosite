@@ -25,10 +25,10 @@ The original plan used `sections.json` + separate JSON files per section. The ac
 
 ## Open questions from review
 
-1. **Deploy button** — every CMS save = Gitea commit = CF Pages deploy. User wants to batch edits and deploy once. Options:
-   - `publish_mode: editorial_workflow` (Sveltia support TBD — needs investigation)
-   - Custom deploy button via CF Pages API injected into admin/index.html
-   - Scheduled CF Pages deploys
+1. **Deploy button** — every CMS save = Gitea commit = CF Pages deploy. User wants to batch edits and deploy once.
+   - `publish_mode: editorial_workflow` — **CONFIRMED NOT SUPPORTED** by Sveltia CMS. Planned for future release, but Gitea backend support is explicitly uncertain (GitHub/GitLab only when it lands). Dead end.
+   - **Chosen path: custom Deploy button** injected into `admin/index.html` that calls the CF Pages deploy API. Editors save freely to Gitea without triggering a deploy, then hit the button when ready.
+   - Implementation: inject a button in the CMS header via MutationObserver, call `POST https://api.cloudflare.com/client/v4/pages/projects/{project}/deployments` with the operator's CF API token. Token must be embedded in the admin page (acceptable since admin is operator/client-only, not public).
 
 2. **UX feedback ongoing** — more changes expected next session
 
