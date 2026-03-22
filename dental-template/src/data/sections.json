@@ -1,0 +1,20 @@
+{
+  "pages": {
+    "home": [
+      { "id": "hero",         "enabled": true  },
+      { "id": "quote",        "enabled": true  },
+      { "id": "features",     "enabled": true  },
+      { "id": "services",     "enabled": true  },
+      { "id": "team",         "enabled": true  },
+      { "id": "reviews",      "enabled": true  },
+      { "id": "hours",        "enabled": true  },
+      { "id": "vergoeding",   "enabled": true  },
+      { "id": "contact",      "enabled": true  },
+      { "id": "faq",          "enabled": false },
+      { "id": "gallery",      "enabled": false },
+      { "id": "before_after", "enabled": false },
+      { "id": "map",          "enabled": false },
+      { "id": "pricing",      "enabled": false }
+    ]
+  }
+}

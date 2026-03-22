@@ -1,0 +1,22 @@
+{
+  "eyebrow": "Veelgestelde Vragen",
+  "title": "Alles wat u wilt weten",
+  "items": [
+    {
+      "question": "Hoe maak ik een afspraak?",
+      "answer": "U kunt een afspraak maken via het contactformulier op onze website, door te bellen of door een e-mail te sturen. Wij reageren zo snel mogelijk."
+    },
+    {
+      "question": "Worden mijn behandelingen vergoed?",
+      "answer": "De meeste preventieve behandelingen worden vergoed vanuit de basisverzekering. Voor andere behandelingen is een aanvullende verzekering nodig. Neem contact met ons op voor meer informatie."
+    },
+    {
+      "question": "Wat moet ik doen bij acute tandpijn?",
+      "answer": "Bij acute tandpijn kunt u ons direct bellen. Wij proberen u zo snel mogelijk te helpen, ook buiten reguliere openingstijden voor spoedeisende gevallen."
+    },
+    {
+      "question": "Hoe vaak moet ik naar de tandarts?",
+      "answer": "Wij adviseren minimaal één keer per jaar een controleafspraak te maken. Afhankelijk van uw mondgezondheid kan dit vaker nodig zijn."
+    }
+  ]
+}
