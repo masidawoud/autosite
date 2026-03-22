@@ -9,10 +9,15 @@
 <body>
   <script src="https://cdn.jsdelivr.net/npm/@sveltia/cms/dist/sveltia-cms.js"></script>
   <script>
-    // Hide the bulk-delete button in the collection list view
+    // Hide bulk-delete button and selection checkboxes in collection list view
     const observer = new MutationObserver(() => {
       document.querySelectorAll('button').forEach(btn => {
         if (btn.textContent.trim() === 'Delete') btn.style.display = 'none';
+      });
+      // Only hide checkboxes in list view; show them in entry editor (boolean fields)
+      const inEditor = location.hash.includes('/entries/') || location.hash.includes('/new');
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.style.display = inEditor ? '' : 'none';
       });
     });
     observer.observe(document.body, { childList: true, subtree: true });
