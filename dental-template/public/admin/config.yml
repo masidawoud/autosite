@@ -43,8 +43,19 @@ collections:
             label: Menupunten
             widget: list
             fields:
-              - { name: label, label: Label, widget: string }
-              - { name: href,  label: Link,  widget: string }
+              - { name: label, label: Linktekst, widget: string }
+              - name: page
+                label: Pagina (selecteer)
+                widget: relation
+                collection: pages
+                search_fields: [title]
+                value_field: '{{slug}}'
+                display_fields: [title]
+                required: false
+              - name: href
+                label: Aangepaste URL (bijv. #contact)
+                widget: string
+                required: false
 
       - name: header_footer
         label: Header & Footer

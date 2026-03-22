@@ -5,10 +5,14 @@ interface Props {
     phone: string;
   };
   nav: {
-    links: Array<{ label: string; href: string }>;
+    links: Array<{ label: string; href?: string; page?: string }>;
   };
 }
 const { business, nav } = Astro.props;
+function resolveHref(link: { href?: string; page?: string }) {
+  if (link.page) return link.page === 'home' ? '/' : `/${link.page}`;
+  return link.href ?? '#';
+}
 ---
 
 <header class="nav" id="nav">
@@ -22,7 +26,7 @@ const { business, nav } = Astro.props;
 
     <nav class="nav__links" aria-label="Hoofdnavigatie">
       {nav.links.map(link => (
-        <a href={link.href}>{link.label}</a>
+        <a href={resolveHref(link)}>{link.label}</a>
       ))}
     </nav>
 
