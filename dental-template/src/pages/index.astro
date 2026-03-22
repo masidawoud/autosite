@@ -1,5 +1,9 @@
 ---
 import site from '../data/site.json';
+import sectionsData from '../data/sections.json';
+import mapData from '../data/map.json';
+import emergency from '../data/emergency.json';
+
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
@@ -12,20 +16,32 @@ import OpeningHours from '../components/OpeningHours.astro';
 import Vergoeding from '../components/Vergoeding.astro';
 import Contact from '../components/Contact.astro';
 import Footer from '../components/Footer.astro';
+import EmergencyBanner from '../components/EmergencyBanner.astro';
+import Map from '../components/Map.astro';
+
+const homeSections = sectionsData.pages.home;
 ---
 
 <Layout title={site.meta.title} description={site.meta.description}>
-  <Nav business={site.business} />
+  <Nav business={site.business} nav={site.nav} />
+  {emergency.enabled && <EmergencyBanner data={emergency} />}
   <main>
-    <Hero data={site.hero} business={site.business} />
-    <Quote data={site.quote} />
-    <Features data={site.features} />
-    <Services data={site.services} />
-    <About data={site.team} />
-    <Reviews data={site.reviews} />
-    <OpeningHours data={site.hours} business={site.business} />
-    <Vergoeding data={site.vergoeding} />
-    <Contact data={site.contact} business={site.business} />
+    {homeSections
+      .filter(s => s.enabled)
+      .map(s => {
+        if (s.id === 'hero')       return <Hero data={site.hero} business={site.business} />;
+        if (s.id === 'quote')      return <Quote data={site.quote} />;
+        if (s.id === 'features')   return <Features data={site.features} />;
+        if (s.id === 'services')   return <Services data={site.services} />;
+        if (s.id === 'team')       return <About data={site.team} />;
+        if (s.id === 'reviews')    return <Reviews data={site.reviews} />;
+        if (s.id === 'hours')      return <OpeningHours data={site.hours} business={site.business} />;
+        if (s.id === 'vergoeding') return <Vergoeding data={site.vergoeding} />;
+        if (s.id === 'contact')    return <Contact data={site.contact} business={site.business} />;
+        if (s.id === 'map')        return <Map data={mapData} />;
+        return null;
+      })
+    }
   </main>
   <Footer business={site.business} footer={site.footer} />
 </Layout>

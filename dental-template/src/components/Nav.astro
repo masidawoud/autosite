@@ -8,12 +8,7 @@ interface Props {
     links: Array<{ label: string; href: string }>;
   };
 }
-const { business, nav = { links: [
-  { label: 'Diensten', href: '#diensten' },
-  { label: 'Team', href: '#over-ons' },
-  { label: 'Vergoeding', href: '#vergoeding' },
-  { label: 'Contact', href: '#contact' }
-] } } = Astro.props;
+const { business, nav } = Astro.props;
 ---
 
 <header class="nav" id="nav">
