@@ -1,0 +1,59 @@
+---
+import { getCollection } from 'astro:content';
+import config from '../data/config.json';
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages', p => p.data.published !== false);
+  return pages.map(page => ({
+    params: { slug: page.slug },
+    props:  { page },
+  }));
+}
+
+const { page } = Astro.props;
+const { Content } = await page.render();
+const title       = page.data.seo_title || page.data.title;
+const description = page.data.seo_description || '';
+---
+
+<Layout title={`${title} — ${config.business.name}`} description={description}>
+  <Nav business={config.business} nav={config.nav} />
+  <main class="page">
+    <div class="container container--narrow">
+      <h1 class="page__title">{page.data.title}</h1>
+      <div class="page__body">
+        <Content />
+      </div>
+    </div>
+  </main>
+  <Footer business={config.business} footer={config.footer} />
+</Layout>
+
+<style>
+  .page {
+    padding-block: clamp(4rem, 8vw, 7rem);
+  }
+
+  .page__title {
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    font-family: var(--font-display);
+  }
+
+  .page__body {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--color-text);
+  }
+
+  .page__body :global(h2) { margin-top: 2.5rem; margin-bottom: 0.75rem; }
+  .page__body :global(h3) { margin-top: 2rem;   margin-bottom: 0.5rem;  }
+  .page__body :global(p)  { margin-bottom: 1rem; }
+  .page__body :global(ul),
+  .page__body :global(ol) { margin-bottom: 1rem; padding-left: 1.5rem; }
+  .page__body :global(li) { margin-bottom: 0.25rem; }
+  .page__body :global(a)  { color: var(--color-accent); text-decoration: underline; }
+  .page__body :global(strong) { font-weight: 600; }
+</style>

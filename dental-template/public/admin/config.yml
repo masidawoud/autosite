@@ -298,3 +298,22 @@ collections:
                       - { name: treatment, label: Behandeling, widget: string }
                       - { name: price,     label: Tarief,      widget: string }
                       - { name: notes,     label: Opmerkingen, widget: string }
+
+  # ─── Losse pagina's ────────────────────────────────────────────────────────
+  - name: custom_pages
+    label: Pagina's aanmaken
+    folder: content/pages
+    create: true
+    slug: '{{fields.slug}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - name: slug
+        label: "URL (bijv. over-ons)"
+        widget: string
+        hint: "Vul dit éénmalig in en wijzig daarna niet meer — de URL van de pagina."
+      - { name: title,           label: Paginatitel,       widget: string                    }
+      - { name: body,            label: Inhoud,            widget: markdown                  }
+      - { name: seo_title,       label: SEO titel,         widget: string,   required: false }
+      - { name: seo_description, label: SEO omschrijving,  widget: text,     required: false }
+      - { name: published,       label: Gepubliceerd,      widget: boolean,  default: true   }
