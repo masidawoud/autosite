@@ -1,6 +1,6 @@
 ---
+import { getEntry } from 'astro:content';
 import config from '../data/config.json';
-import home from '../data/pages/home.json';
 
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
@@ -16,28 +16,30 @@ import Contact from '../components/Contact.astro';
 import Footer from '../components/Footer.astro';
 import EmergencyBanner from '../components/EmergencyBanner.astro';
 import Map from '../components/Map.astro';
+
+const home = await getEntry('pages', 'home');
+const { Content } = await home.render();
+const sections = (home.data.sections ?? []).filter((s: any) => s.enabled);
 ---
 
 <Layout title={config.meta.title} description={config.meta.description}>
   <Nav business={config.business} nav={config.nav} />
   {config.emergency.enabled && <EmergencyBanner data={config.emergency} />}
   <main>
-    {home.sections
-      .filter(s => s.enabled)
-      .map(s => {
-        if (s.type === 'hero')       return <Hero data={s} business={config.business} />;
-        if (s.type === 'quote')      return <Quote data={s} />;
-        if (s.type === 'features')   return <Features data={s} />;
-        if (s.type === 'services')   return <Services data={s} />;
-        if (s.type === 'team')       return <About data={s} />;
-        if (s.type === 'reviews')    return <Reviews data={s} />;
-        if (s.type === 'hours')      return <OpeningHours data={s} business={config.business} />;
-        if (s.type === 'vergoeding') return <Vergoeding data={s} />;
-        if (s.type === 'contact')    return <Contact data={s} business={config.business} />;
-        if (s.type === 'map')        return <Map data={s} />;
-        return null;
-      })
-    }
+    {sections.map((s: any) => {
+      if (s.type === 'hero')       return <Hero data={s} business={config.business} />;
+      if (s.type === 'quote')      return <Quote data={s} />;
+      if (s.type === 'features')   return <Features data={s} />;
+      if (s.type === 'services')   return <Services data={s} />;
+      if (s.type === 'team')       return <About data={s} />;
+      if (s.type === 'reviews')    return <Reviews data={s} />;
+      if (s.type === 'hours')      return <OpeningHours data={s} business={config.business} />;
+      if (s.type === 'vergoeding') return <Vergoeding data={s} />;
+      if (s.type === 'contact')    return <Contact data={s} business={config.business} />;
+      if (s.type === 'map')        return <Map data={s} />;
+      return null;
+    })}
+    <Content />
   </main>
   <Footer business={config.business} footer={config.footer} />
 </Layout>

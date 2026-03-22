@@ -4,9 +4,22 @@ import config from '../data/config.json';
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import EmergencyBanner from '../components/EmergencyBanner.astro';
+import Hero from '../components/Hero.astro';
+import Quote from '../components/Quote.astro';
+import Features from '../components/Features.astro';
+import Services from '../components/Services.astro';
+import About from '../components/About.astro';
+import Reviews from '../components/Reviews.astro';
+import OpeningHours from '../components/OpeningHours.astro';
+import Vergoeding from '../components/Vergoeding.astro';
+import Contact from '../components/Contact.astro';
+import Map from '../components/Map.astro';
 
 export async function getStaticPaths() {
-  const pages = await getCollection('pages', p => p.data.published !== false);
+  const pages = await getCollection('pages', p =>
+    p.id !== 'home' && p.data.published !== false
+  );
   return pages.map(page => ({
     params: { slug: page.slug },
     props:  { page },
@@ -15,45 +28,50 @@ export async function getStaticPaths() {
 
 const { page } = Astro.props;
 const { Content } = await page.render();
+const sections = (page.data.sections ?? []).filter((s: any) => s.enabled);
 const title       = page.data.seo_title || page.data.title;
 const description = page.data.seo_description || '';
 ---
 
 <Layout title={`${title} — ${config.business.name}`} description={description}>
   <Nav business={config.business} nav={config.nav} />
-  <main class="page">
-    <div class="container container--narrow">
-      <h1 class="page__title">{page.data.title}</h1>
-      <div class="page__body">
-        <Content />
-      </div>
+  {config.emergency.enabled && <EmergencyBanner data={config.emergency} />}
+  <main>
+    {sections.map((s: any) => {
+      if (s.type === 'hero')       return <Hero data={s} business={config.business} />;
+      if (s.type === 'quote')      return <Quote data={s} />;
+      if (s.type === 'features')   return <Features data={s} />;
+      if (s.type === 'services')   return <Services data={s} />;
+      if (s.type === 'team')       return <About data={s} />;
+      if (s.type === 'reviews')    return <Reviews data={s} />;
+      if (s.type === 'hours')      return <OpeningHours data={s} business={config.business} />;
+      if (s.type === 'vergoeding') return <Vergoeding data={s} />;
+      if (s.type === 'contact')    return <Contact data={s} business={config.business} />;
+      if (s.type === 'map')        return <Map data={s} />;
+      return null;
+    })}
+    {sections.length > 0 && <div class="page-body-divider" />}
+    <div class="page-body container container--narrow">
+      <Content />
     </div>
   </main>
   <Footer business={config.business} footer={config.footer} />
 </Layout>
 
 <style>
-  .page {
+  .page-body {
     padding-block: clamp(4rem, 8vw, 7rem);
-  }
-
-  .page__title {
-    margin-bottom: clamp(2rem, 4vw, 3rem);
-    font-family: var(--font-display);
-  }
-
-  .page__body {
     font-size: 1.0625rem;
     line-height: 1.8;
     color: var(--color-text);
   }
-
-  .page__body :global(h2) { margin-top: 2.5rem; margin-bottom: 0.75rem; }
-  .page__body :global(h3) { margin-top: 2rem;   margin-bottom: 0.5rem;  }
-  .page__body :global(p)  { margin-bottom: 1rem; }
-  .page__body :global(ul),
-  .page__body :global(ol) { margin-bottom: 1rem; padding-left: 1.5rem; }
-  .page__body :global(li) { margin-bottom: 0.25rem; }
-  .page__body :global(a)  { color: var(--color-accent); text-decoration: underline; }
-  .page__body :global(strong) { font-weight: 600; }
+  .page-body :global(h1) { font-family: var(--font-display); margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .page-body :global(h2) { margin-top: 2.5rem; margin-bottom: 0.75rem; }
+  .page-body :global(h3) { margin-top: 2rem;   margin-bottom: 0.5rem;  }
+  .page-body :global(p)  { margin-bottom: 1rem; }
+  .page-body :global(ul),
+  .page-body :global(ol) { margin-bottom: 1rem; padding-left: 1.5rem; }
+  .page-body :global(li) { margin-bottom: 0.25rem; }
+  .page-body :global(a)  { color: var(--color-accent); text-decoration: underline; }
+  .page-body :global(strong) { font-weight: 600; }
 </style>

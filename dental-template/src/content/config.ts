@@ -4,6 +4,7 @@ const pages = defineCollection({
   type: 'content',
   schema: z.object({
     title:           z.string(),
+    sections:        z.array(z.any()).optional(),
     seo_title:       z.string().optional(),
     seo_description: z.string().optional(),
     published:       z.boolean().default(true),

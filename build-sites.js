@@ -185,8 +185,11 @@ function buildDummyConfig(prospect) {
 }
 
 function buildDummyHomePage(prospect) {
-  const template = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/pages/home.json'), 'utf-8'));
-  const hero = template.sections.find(s => s.type === 'hero');
+  const homeMd = fs.readFileSync(path.join(TEMPLATE_DIR, 'src/content/pages/home.md'), 'utf-8');
+  // Extract JSON frontmatter (between --- delimiters)
+  const match = homeMd.match(/^---\n([\s\S]*?)\n---/);
+  const template = match ? JSON.parse(match[1]) : { title: 'Home', sections: [] };
+  const hero = (template.sections || []).find(s => s.type === 'hero');
   if (hero) {
     hero.eyebrow   = `Tandarts ${prospect.city}`;
     hero.image_url = 'https://picsum.photos/seed/dental-hero/720/860';
@@ -540,7 +543,10 @@ async function main() {
             },
           };
           const coreTypes = ['hero','quote','features','services','team','reviews','hours','vergoeding','contact'];
-          const templateHome = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, 'src/data/pages/home.json'), 'utf-8'));
+          // templateHome only used below for fallback map lookup (kept for reference, not written to disk)
+          const _homeMd = fs.readFileSync(path.join(TEMPLATE_DIR, 'src/content/pages/home.md'), 'utf-8');
+          const _match = _homeMd.match(/^---\n([\s\S]*?)\n---/);
+          const templateHome = _match ? JSON.parse(_match[1]) : { sections: [] };
           homeJson = {
             sections: [
               { type: 'hero',       enabled: true, ...siteJson.hero       },
@@ -568,10 +574,12 @@ async function main() {
         console.log('    ✓ Template ready');
 
         // 4. Write data files
-        fs.mkdirSync(path.join(buildDir, 'src/data/pages'), { recursive: true });
-        fs.writeFileSync(path.join(buildDir, 'src/data/config.json'),       JSON.stringify(configJson, null, 2));
-        fs.writeFileSync(path.join(buildDir, 'src/data/pages/home.json'),   JSON.stringify(homeJson,   null, 2));
-        fs.writeFileSync(path.join(buildDir, 'src/data/theme.json'),        JSON.stringify(themeJson,  null, 2));
+        fs.mkdirSync(path.join(buildDir, 'src/content/pages'), { recursive: true });
+        fs.writeFileSync(path.join(buildDir, 'src/data/config.json'), JSON.stringify(configJson, null, 2));
+        fs.writeFileSync(path.join(buildDir, 'src/data/theme.json'),  JSON.stringify(themeJson,  null, 2));
+        // Write home page as markdown with JSON frontmatter
+        const homeFrontmatter = JSON.stringify({ title: homeJson.title || 'Home', published: true, sections: homeJson.sections }, null, 2);
+        fs.writeFileSync(path.join(buildDir, 'src/content/pages/home.md'), `---\n${homeFrontmatter}\n---\n`);
 
         console.log('    ✓ Data files written');
 

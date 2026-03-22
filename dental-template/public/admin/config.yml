@@ -72,248 +72,239 @@ collections:
               - { name: text,    label: Tekst,        widget: string  }
               - { name: phone,   label: Telefoon,     widget: string  }
 
-  # ─── Pagina's ──────────────────────────────────────────────────────────────
+
+  # ─── Pagina's (home + alle losse pagina's) ────────────────────────────────
   - name: pages
     label: Pagina's
-    files:
-      - name: home
-        label: Home
-        file: pages/home.json
-        fields:
-          - name: sections
-            label: Secties
-            widget: list
-            types:
-
-              - name: hero
-                label: Hero
-                widget: object
-                summary: 'Hero — {{fields.headline}}'
-                fields:
-                  - { name: enabled,       label: Actief,         widget: boolean, default: true   }
-                  - { name: eyebrow,       label: Eyebrow,        widget: string                   }
-                  - { name: headline,      label: Koptekst,       widget: string                   }
-                  - { name: description,   label: Omschrijving,   widget: text                     }
-                  - { name: cta_primary,   label: Knop primair,   widget: string                   }
-                  - { name: cta_secondary, label: Knop secundair, widget: string                   }
-                  - { name: image_url,     label: Afbeelding URL, widget: string                   }
-
-              - name: quote
-                label: Quote
-                widget: object
-                summary: 'Quote — {{fields.author_name}}'
-                fields:
-                  - { name: enabled,     label: Actief,   widget: boolean, default: true }
-                  - { name: text,        label: Tekst,    widget: text                   }
-                  - { name: author_name, label: Naam,     widget: string                 }
-                  - { name: author_role, label: Functie,  widget: string                 }
-
-              - name: features
-                label: Kenmerken
-                widget: object
-                summary: 'Kenmerken — {{fields.title}}'
-                fields:
-                  - { name: enabled,   label: Actief,     widget: boolean, default: true }
-                  - { name: eyebrow,   label: Eyebrow,    widget: string                 }
-                  - { name: title,     label: Titel,      widget: string                 }
-                  - { name: subtitle,  label: Subtitel,   widget: string                 }
-                  - { name: image_url, label: Afbeelding, widget: string                 }
-                  - name: items
-                    label: Kenmerken
-                    widget: list
-                    fields:
-                      - { name: icon,  label: Icoon,        widget: string }
-                      - { name: title, label: Titel,        widget: string }
-                      - { name: desc,  label: Omschrijving, widget: text   }
-
-              - name: services
-                label: Diensten
-                widget: object
-                summary: 'Diensten — {{fields.title}}'
-                fields:
-                  - { name: enabled,  label: Actief,   widget: boolean, default: true }
-                  - { name: eyebrow,  label: Eyebrow,  widget: string                 }
-                  - { name: title,    label: Titel,    widget: string                 }
-                  - { name: subtitle, label: Subtitel, widget: string                 }
-                  - name: items
-                    label: Diensten
-                    widget: list
-                    fields:
-                      - { name: tag,       label: Label,        widget: string }
-                      - { name: title,     label: Titel,        widget: string }
-                      - { name: desc,      label: Omschrijving, widget: text   }
-                      - { name: image_url, label: Afbeelding,   widget: string }
-                      - { name: items,     label: Bullets,      widget: list, field: { name: item, widget: string } }
-                      - { name: cta,       label: Knoptekst,    widget: string }
-
-              - name: team
-                label: Team
-                widget: object
-                summary: 'Team — {{fields.title}}'
-                fields:
-                  - { name: enabled,  label: Actief,   widget: boolean, default: true }
-                  - { name: eyebrow,  label: Eyebrow,  widget: string                 }
-                  - { name: title,    label: Titel,    widget: string                 }
-                  - { name: subtitle, label: Subtitel, widget: string                 }
-                  - name: members
-                    label: Teamleden
-                    widget: list
-                    fields:
-                      - { name: name,      label: Naam,     widget: string }
-                      - { name: role,      label: Functie,  widget: string }
-                      - { name: bio,       label: Bio,      widget: text   }
-                      - { name: image_url, label: Foto URL, widget: string }
-
-              - name: reviews
-                label: Reviews
-                widget: object
-                summary: 'Reviews — {{fields.title}}'
-                fields:
-                  - { name: enabled,  label: Actief,   widget: boolean, default: true }
-                  - { name: title,    label: Titel,    widget: string                 }
-                  - { name: subtitle, label: Subtitel, widget: string                 }
-                  - name: items
-                    label: Reviews
-                    widget: list
-                    fields:
-                      - { name: name,  label: Naam,    widget: string                    }
-                      - { name: stars, label: Sterren, widget: number, min: 1, max: 5    }
-                      - { name: date,  label: Datum,   widget: string                    }
-                      - { name: text,  label: Tekst,   widget: text                      }
-
-              - name: hours
-                label: Openingstijden
-                widget: object
-                summary: 'Openingstijden'
-                fields:
-                  - { name: enabled, label: Actief, widget: boolean, default: true }
-                  - name: items
-                    label: Dagen
-                    widget: list
-                    fields:
-                      - { name: day,  label: Dag,  widget: string  }
-                      - { name: time, label: Tijd, widget: string  }
-                      - { name: open, label: Open, widget: boolean }
-
-              - name: vergoeding
-                label: Vergoeding
-                widget: object
-                summary: 'Vergoeding — {{fields.title}}'
-                fields:
-                  - { name: enabled, label: Actief,  widget: boolean, default: true }
-                  - { name: eyebrow, label: Eyebrow, widget: string                 }
-                  - { name: title,   label: Titel,   widget: string                 }
-                  - { name: intro,   label: Intro,   widget: text                   }
-                  - name: blocks
-                    label: Tekstblokken
-                    widget: list
-                    fields:
-                      - { name: title, label: Titel, widget: string }
-                      - { name: text,  label: Tekst, widget: text   }
-                  - name: insurers
-                    label: Verzekeraars
-                    widget: list
-                    field: { name: name, widget: string }
-                  - { name: cta, label: CTA-tekst, widget: string }
-
-              - name: contact
-                label: Contact
-                widget: object
-                summary: 'Contact — {{fields.title}}'
-                fields:
-                  - { name: enabled, label: Actief,      widget: boolean, default: true }
-                  - { name: eyebrow, label: Eyebrow,     widget: string                 }
-                  - { name: title,   label: Titel,       widget: string                 }
-                  - { name: intro,   label: Omschrijving, widget: text                  }
-
-              - name: faq
-                label: FAQ
-                widget: object
-                summary: 'FAQ — {{fields.title}}'
-                fields:
-                  - { name: enabled, label: Actief,  widget: boolean, default: false }
-                  - { name: eyebrow, label: Eyebrow, widget: string                  }
-                  - { name: title,   label: Titel,   widget: string                  }
-                  - name: items
-                    label: Vragen
-                    widget: list
-                    fields:
-                      - { name: question, label: Vraag,    widget: string }
-                      - { name: answer,   label: Antwoord, widget: text   }
-
-              - name: gallery
-                label: Galerij
-                widget: object
-                summary: 'Galerij — {{fields.title}}'
-                fields:
-                  - { name: enabled, label: Actief,  widget: boolean, default: false }
-                  - { name: eyebrow, label: Eyebrow, widget: string                  }
-                  - { name: title,   label: Titel,   widget: string                  }
-                  - name: items
-                    label: Foto's
-                    widget: list
-                    fields:
-                      - { name: image_url, label: Afbeelding, widget: string }
-                      - { name: caption,   label: Bijschrift, widget: string }
-
-              - name: before_after
-                label: Voor & Na
-                widget: object
-                summary: 'Voor & Na — {{fields.title}}'
-                fields:
-                  - { name: enabled, label: Actief,  widget: boolean, default: false }
-                  - { name: eyebrow, label: Eyebrow, widget: string                  }
-                  - { name: title,   label: Titel,   widget: string                  }
-                  - name: items
-                    label: Resultaten
-                    widget: list
-                    fields:
-                      - { name: before_url,  label: Voor-foto,    widget: string }
-                      - { name: after_url,   label: Na-foto,      widget: string }
-                      - { name: description, label: Omschrijving, widget: text   }
-
-              - name: map
-                label: Kaart
-                widget: object
-                summary: 'Kaart — {{fields.title}}'
-                fields:
-                  - { name: enabled,   label: Actief,      widget: boolean, default: false }
-                  - { name: title,     label: Titel,       widget: string                  }
-                  - { name: embed_url, label: Embed URL,   widget: string                  }
-                  - { name: label,     label: Adreslabel,  widget: string                  }
-
-              - name: pricing
-                label: Tarieven
-                widget: object
-                summary: 'Tarieven — {{fields.title}}'
-                fields:
-                  - { name: enabled,    label: Actief,     widget: boolean, default: false }
-                  - { name: eyebrow,    label: Eyebrow,    widget: string                  }
-                  - { name: title,      label: Titel,      widget: string                  }
-                  - { name: disclaimer, label: Disclaimer, widget: string                  }
-                  - name: items
-                    label: Behandelingen
-                    widget: list
-                    fields:
-                      - { name: treatment, label: Behandeling, widget: string }
-                      - { name: price,     label: Tarief,      widget: string }
-                      - { name: notes,     label: Opmerkingen, widget: string }
-
-  # ─── Losse pagina's ────────────────────────────────────────────────────────
-  - name: custom_pages
-    label: Pagina's aanmaken
     folder: content/pages
     create: true
-    slug: '{{fields.slug}}'
+    slug: '{{slug}}'
     extension: md
     format: frontmatter
+    summary: '{{title}}'
     fields:
-      - name: slug
-        label: "URL (bijv. over-ons)"
-        widget: string
-        hint: "Vul dit éénmalig in en wijzig daarna niet meer — de URL van de pagina."
-      - { name: title,           label: Paginatitel,       widget: string                    }
-      - { name: body,            label: Inhoud,            widget: markdown                  }
-      - { name: seo_title,       label: SEO titel,         widget: string,   required: false }
-      - { name: seo_description, label: SEO omschrijving,  widget: text,     required: false }
-      - { name: published,       label: Gepubliceerd,      widget: boolean,  default: true   }
+      - { name: title,           label: Paginatitel,      widget: string                    }
+      - { name: published,       label: Gepubliceerd,     widget: boolean, default: true    }
+      - name: sections
+        label: Secties
+        widget: list
+        required: false
+        types:
+
+          - name: hero
+            label: Hero
+            widget: object
+            summary: 'Hero — {{fields.headline}}'
+            fields:
+              - { name: enabled,       label: Actief,         widget: boolean, default: true }
+              - { name: eyebrow,       label: Eyebrow,        widget: string                 }
+              - { name: headline,      label: Koptekst,       widget: string                 }
+              - { name: description,   label: Omschrijving,   widget: text                   }
+              - { name: cta_primary,   label: Knop primair,   widget: string                 }
+              - { name: cta_secondary, label: Knop secundair, widget: string                 }
+              - { name: image_url,     label: Afbeelding URL, widget: string                 }
+
+          - name: quote
+            label: Quote
+            widget: object
+            summary: 'Quote — {{fields.author_name}}'
+            fields:
+              - { name: enabled,     label: Actief,  widget: boolean, default: true }
+              - { name: text,        label: Tekst,   widget: text                   }
+              - { name: author_name, label: Naam,    widget: string                 }
+              - { name: author_role, label: Functie, widget: string                 }
+
+          - name: features
+            label: Kenmerken
+            widget: object
+            summary: 'Kenmerken — {{fields.title}}'
+            fields:
+              - { name: enabled,   label: Actief,     widget: boolean, default: true }
+              - { name: eyebrow,   label: Eyebrow,    widget: string                 }
+              - { name: title,     label: Titel,      widget: string                 }
+              - { name: subtitle,  label: Subtitel,   widget: string                 }
+              - { name: image_url, label: Afbeelding, widget: string                 }
+              - name: items
+                label: Kenmerken
+                widget: list
+                fields:
+                  - { name: icon,  label: Icoon,        widget: string }
+                  - { name: title, label: Titel,        widget: string }
+                  - { name: desc,  label: Omschrijving, widget: text   }
+
+          - name: services
+            label: Diensten
+            widget: object
+            summary: 'Diensten — {{fields.title}}'
+            fields:
+              - { name: enabled,  label: Actief,   widget: boolean, default: true }
+              - { name: eyebrow,  label: Eyebrow,  widget: string                 }
+              - { name: title,    label: Titel,    widget: string                 }
+              - { name: subtitle, label: Subtitel, widget: string                 }
+              - name: items
+                label: Diensten
+                widget: list
+                fields:
+                  - { name: tag,       label: Label,        widget: string }
+                  - { name: title,     label: Titel,        widget: string }
+                  - { name: desc,      label: Omschrijving, widget: text   }
+                  - { name: image_url, label: Afbeelding,   widget: string }
+                  - { name: items,     label: Bullets,      widget: list, field: { name: item, widget: string } }
+                  - { name: cta,       label: Knoptekst,    widget: string }
+
+          - name: team
+            label: Team
+            widget: object
+            summary: 'Team — {{fields.title}}'
+            fields:
+              - { name: enabled,  label: Actief,   widget: boolean, default: true }
+              - { name: eyebrow,  label: Eyebrow,  widget: string                 }
+              - { name: title,    label: Titel,    widget: string                 }
+              - { name: subtitle, label: Subtitel, widget: string                 }
+              - name: members
+                label: Teamleden
+                widget: list
+                fields:
+                  - { name: name,      label: Naam,     widget: string }
+                  - { name: role,      label: Functie,  widget: string }
+                  - { name: bio,       label: Bio,      widget: text   }
+                  - { name: image_url, label: Foto URL, widget: string }
+
+          - name: reviews
+            label: Reviews
+            widget: object
+            summary: 'Reviews — {{fields.title}}'
+            fields:
+              - { name: enabled,  label: Actief,   widget: boolean, default: true }
+              - { name: title,    label: Titel,    widget: string                 }
+              - { name: subtitle, label: Subtitel, widget: string                 }
+              - name: items
+                label: Reviews
+                widget: list
+                fields:
+                  - { name: name,  label: Naam,    widget: string                 }
+                  - { name: stars, label: Sterren, widget: number, min: 1, max: 5 }
+                  - { name: date,  label: Datum,   widget: string                 }
+                  - { name: text,  label: Tekst,   widget: text                   }
+
+          - name: hours
+            label: Openingstijden
+            widget: object
+            summary: 'Openingstijden'
+            fields:
+              - { name: enabled, label: Actief, widget: boolean, default: true }
+              - name: items
+                label: Dagen
+                widget: list
+                fields:
+                  - { name: day,  label: Dag,  widget: string  }
+                  - { name: time, label: Tijd, widget: string  }
+                  - { name: open, label: Open, widget: boolean }
+
+          - name: vergoeding
+            label: Vergoeding
+            widget: object
+            summary: 'Vergoeding — {{fields.title}}'
+            fields:
+              - { name: enabled, label: Actief,  widget: boolean, default: true }
+              - { name: eyebrow, label: Eyebrow, widget: string                 }
+              - { name: title,   label: Titel,   widget: string                 }
+              - { name: intro,   label: Intro,   widget: text                   }
+              - name: blocks
+                label: Tekstblokken
+                widget: list
+                fields:
+                  - { name: title, label: Titel, widget: string }
+                  - { name: text,  label: Tekst, widget: text   }
+              - name: insurers
+                label: Verzekeraars
+                widget: list
+                field: { name: name, widget: string }
+              - { name: cta, label: CTA-tekst, widget: string }
+
+          - name: contact
+            label: Contact
+            widget: object
+            summary: 'Contact — {{fields.title}}'
+            fields:
+              - { name: enabled, label: Actief,       widget: boolean, default: true }
+              - { name: eyebrow, label: Eyebrow,      widget: string                 }
+              - { name: title,   label: Titel,        widget: string                 }
+              - { name: intro,   label: Omschrijving, widget: text                   }
+
+          - name: faq
+            label: FAQ
+            widget: object
+            summary: 'FAQ — {{fields.title}}'
+            fields:
+              - { name: enabled, label: Actief,  widget: boolean, default: false }
+              - { name: eyebrow, label: Eyebrow, widget: string                  }
+              - { name: title,   label: Titel,   widget: string                  }
+              - name: items
+                label: Vragen
+                widget: list
+                fields:
+                  - { name: question, label: Vraag,    widget: string }
+                  - { name: answer,   label: Antwoord, widget: text   }
+
+          - name: gallery
+            label: Galerij
+            widget: object
+            summary: 'Galerij — {{fields.title}}'
+            fields:
+              - { name: enabled, label: Actief,  widget: boolean, default: false }
+              - { name: eyebrow, label: Eyebrow, widget: string                  }
+              - { name: title,   label: Titel,   widget: string                  }
+              - name: items
+                label: Foto's
+                widget: list
+                fields:
+                  - { name: image_url, label: Afbeelding, widget: string }
+                  - { name: caption,   label: Bijschrift, widget: string }
+
+          - name: before_after
+            label: Voor & Na
+            widget: object
+            summary: 'Voor & Na — {{fields.title}}'
+            fields:
+              - { name: enabled, label: Actief,  widget: boolean, default: false }
+              - { name: eyebrow, label: Eyebrow, widget: string                  }
+              - { name: title,   label: Titel,   widget: string                  }
+              - name: items
+                label: Resultaten
+                widget: list
+                fields:
+                  - { name: before_url,  label: Voor-foto,    widget: string }
+                  - { name: after_url,   label: Na-foto,      widget: string }
+                  - { name: description, label: Omschrijving, widget: text   }
+
+          - name: map
+            label: Kaart
+            widget: object
+            summary: 'Kaart — {{fields.title}}'
+            fields:
+              - { name: enabled,   label: Actief,     widget: boolean, default: false }
+              - { name: title,     label: Titel,      widget: string                  }
+              - { name: embed_url, label: Embed URL,  widget: string                  }
+              - { name: label,     label: Adreslabel, widget: string                  }
+
+          - name: pricing
+            label: Tarieven
+            widget: object
+            summary: 'Tarieven — {{fields.title}}'
+            fields:
+              - { name: enabled,    label: Actief,     widget: boolean, default: false }
+              - { name: eyebrow,    label: Eyebrow,    widget: string                  }
+              - { name: title,      label: Titel,      widget: string                  }
+              - { name: disclaimer, label: Disclaimer, widget: string                  }
+              - name: items
+                label: Behandelingen
+                widget: list
+                fields:
+                  - { name: treatment, label: Behandeling, widget: string }
+                  - { name: price,     label: Tarief,      widget: string }
+                  - { name: notes,     label: Opmerkingen, widget: string }
+
+      - { name: body,            label: Tekstinhoud,      widget: markdown, required: false }
+      - { name: seo_title,       label: SEO titel,        widget: string,   required: false }
+      - { name: seo_description, label: SEO omschrijving, widget: text,     required: false }
