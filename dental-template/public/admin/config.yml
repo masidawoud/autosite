@@ -62,7 +62,7 @@ collections:
                 summary: '{{fields.label}}'
                 fields:
                   - { name: label, label: Linktekst, widget: string }
-                  - { name: href,  label: URL (bijv. #contact), widget: string }
+                  - { name: href,  label: 'URL (bijv. #contact)', widget: string }
 
       - name: header_footer
         label: Header & Footer
