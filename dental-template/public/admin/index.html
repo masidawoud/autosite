@@ -8,5 +8,14 @@
 </head>
 <body>
   <script src="https://cdn.jsdelivr.net/npm/@sveltia/cms/dist/sveltia-cms.js"></script>
+  <script>
+    // Hide the bulk-delete button in the collection list view
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll('button').forEach(btn => {
+        if (btn.textContent.trim() === 'Delete') btn.style.display = 'none';
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  </script>
 </body>
 </html>
