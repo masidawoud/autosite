@@ -19,7 +19,7 @@ collections:
 
       - name: praktijkgegevens
         label: Praktijkgegevens
-        file: src/data/business.json
+        file: dental-template/src/data/business.json
         fields:
           - { name: name,        label: Praktijknaam,   widget: string }
           - { name: address,     label: Adres,          widget: string }
@@ -30,14 +30,14 @@ collections:
 
       - name: contactformulier
         label: Contactformulier
-        file: src/data/contact_form.json
+        file: dental-template/src/data/contact_form.json
         fields:
           - { name: recipient_email,      label: Ontvanger e-mail,    widget: string }
           - { name: confirmation_message, label: Bevestigingsbericht, widget: text   }
 
       - name: menu
         label: Menu
-        file: src/data/nav.json
+        file: dental-template/src/data/nav.json
         fields:
           - name: links
             label: Menupunten
@@ -48,7 +48,7 @@ collections:
 
       - name: header_footer
         label: Header & Footer
-        file: src/data/footer.json
+        file: dental-template/src/data/footer.json
         fields:
           - { name: meta_title,       label: Paginatitel (SEO),    widget: string }
           - { name: meta_description, label: Omschrijving (SEO),   widget: text   }
@@ -65,7 +65,7 @@ collections:
 
       - name: spoedmelding
         label: Spoedmelding
-        file: src/data/emergency.json
+        file: dental-template/src/data/emergency.json
         fields:
           - { name: enabled, label: Banner tonen, widget: boolean }
           - { name: text,    label: Tekst,        widget: string  }
@@ -75,7 +75,7 @@ collections:
   # ─── Pagina's ─────────────────────────────────────────────────────────────────
   - name: pages
     label: Pagina's
-    folder: src/content/pages
+    folder: dental-template/src/content/pages
     create: true
     slug: '{{slug}}'
     extension: md
