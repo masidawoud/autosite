@@ -26,13 +26,23 @@ jobs:
           cache: 'npm'
           cache-dependency-path: dental-template/package-lock.json
 
-      - name: Fetch content from Payload and write site.json
+      - name: Fetch content from Payload and write data files
         env:
           PAYLOAD_API_URL: ${{ secrets.PAYLOAD_API_URL }}
           PAYLOAD_API_EMAIL: ${{ secrets.PAYLOAD_API_EMAIL }}
           PAYLOAD_API_PASSWORD: ${{ secrets.PAYLOAD_API_PASSWORD }}
         run: |
           node -e "
+          const fs = require('fs');
+
+          function lightenAccent(hex) {
+            const h = hex.replace('#', '');
+            const r = Math.round(parseInt(h.substring(0,2), 16) * 0.15 + 255 * 0.85).toString(16).padStart(2, '0');
+            const g = Math.round(parseInt(h.substring(2,4), 16) * 0.15 + 255 * 0.85).toString(16).padStart(2, '0');
+            const b = Math.round(parseInt(h.substring(4,6), 16) * 0.15 + 255 * 0.85).toString(16).padStart(2, '0');
+            return '#' + r + g + b;
+          }
+
           async function main() {
             // 1. Login to get a token
             const loginRes = await fetch(process.env.PAYLOAD_API_URL + '/api/users/login', {
@@ -51,9 +61,9 @@ jobs:
             const token = loginData.token;
             console.log('Logged in successfully');
 
-            // 2. Fetch the dental site for this tenant
+            // 2. Fetch the dental site for this tenant (depth=2 for nested relations)
             const clientId = '${{ inputs.client_id }}';
-            const url = process.env.PAYLOAD_API_URL + '/api/dental-sites?where[tenant.slug][equals]=' + clientId + '&depth=1&limit=1';
+            const url = process.env.PAYLOAD_API_URL + '/api/dental-sites?where[tenant.slug][equals]=' + clientId + '&depth=2&limit=1';
             const siteRes = await fetch(url, {
               headers: { Authorization: 'Bearer ' + token },
             });
@@ -67,44 +77,139 @@ jobs:
             const site = siteData.docs[0];
             console.log('Fetched site:', site.practiceName);
 
-            // 3. Map Payload fields to site.json format
-            const siteJson = {
-              business: {
-                name: site.practiceName || '',
-                phone: site.contact?.phone || '',
-                email: site.contact?.email || '',
-              },
-              hero: {
-                eyebrow: '',
-                headline_light: site.hero?.headlineLight || '',
-                headline_heavy: site.hero?.headlineHeavy || '',
-                description: site.hero?.subtext || '',
-                cta_primary: site.hero?.cta || 'Maak een afspraak',
-                cta_secondary: 'Onze diensten',
-                image_url: 'https://picsum.photos/seed/dental-hero/720/860',
-              },
-              services: {
-                eyebrow: 'Diensten',
-                title: 'Alles voor een gezond gebit',
-                subtitle: '',
-                items: (site.services || []).map(s => ({
-                  tag: '',
-                  title: s.name,
-                  desc: s.description || '',
-                  image_url: '',
-                })),
-              },
+            // 3. Write business.json
+            const businessJson = {
+              name: site.practiceName || '',
+              city: site.business?.city || '',
+              address: site.business?.address || '',
+              postal_code: site.business?.postalCode || '',
+              phone: site.contact?.phone || '',
+              email: site.contact?.email || '',
+              google_reviews_score: site.business?.googleReviewsScore || '',
+              google_reviews_count: site.business?.googleReviewsCount || 0,
+              google_reviews_url: site.business?.googleReviewsUrl || '#',
             };
+            fs.writeFileSync('dental-template/src/data/business.json', JSON.stringify(businessJson, null, 2));
+            console.log('business.json written');
 
-            // 4. Write to dental-template
-            require('fs').writeFileSync(
-              'dental-template/src/data/site.json',
-              JSON.stringify(siteJson, null, 2)
-            );
-            console.log('site.json written successfully');
+            // 4. Write footer.json
+            const footerJson = {
+              meta_title: site.footer?.metaTitle || '',
+              meta_description: site.footer?.metaDescription || '',
+              tagline: site.footer?.tagline || '',
+              social: [],
+            };
+            fs.writeFileSync('dental-template/src/data/footer.json', JSON.stringify(footerJson, null, 2));
+            console.log('footer.json written');
+
+            // 5. Load theme preset, apply accent overrides, write theme.json
+            const stylePreset = site.theme?.stylePreset || 'warm-editorial';
+            const themePresetPath = 'dental-template/src/data/themes/' + stylePreset + '.json';
+            const theme = JSON.parse(fs.readFileSync(themePresetPath, 'utf8'));
+
+            if (site.theme?.accentColor) {
+              theme.colors.accent = site.theme.accentColor;
+              theme.colors.accent_light = lightenAccent(site.theme.accentColor);
+            }
+            if (site.theme?.accentHoverColor) {
+              theme.colors.accent_hover = site.theme.accentHoverColor;
+            }
+
+            fs.writeFileSync('dental-template/src/data/theme.json', JSON.stringify(theme, null, 2));
+            console.log('theme.json written (preset: ' + stylePreset + ')');
+
+            // 6. Build sections array for home.md
+            const sections = [
+              {
+                type: 'hero', enabled: true,
+                eyebrow: site.hero?.eyebrow || '',
+                headline: site.hero?.headline || '',
+                description: site.hero?.description || '',
+                cta_primary: site.hero?.ctaPrimary || 'Maak een afspraak',
+                cta_secondary: site.hero?.ctaSecondary || 'Bel ons',
+                image_url: site.hero?.imageUrl || 'https://picsum.photos/seed/dental-hero/720/860',
+              },
+              {
+                type: 'quote', enabled: true,
+                text: site.quote?.text || '',
+                author_name: site.quote?.authorName || '',
+                author_role: site.quote?.authorRole || '',
+              },
+              {
+                type: 'features', enabled: true,
+                eyebrow: site.features?.eyebrow || '',
+                title: site.features?.title || '',
+                subtitle: site.features?.subtitle || '',
+                image_url: site.features?.imageUrl || '',
+                items: (site.features?.items || []).map(function(i) {
+                  return { icon: i.icon, title: i.title, desc: i.desc };
+                }),
+              },
+              {
+                type: 'services', enabled: true,
+                eyebrow: site.services?.eyebrow || '',
+                title: site.services?.title || '',
+                subtitle: site.services?.subtitle || '',
+                items: (site.services?.items || []).map(function(i) {
+                  return {
+                    tag: i.tag || '',
+                    title: i.title || '',
+                    desc: i.desc || '',
+                    image_url: i.imageUrl || '',
+                    items: Array.isArray(i.bulletsJson) ? i.bulletsJson : [],
+                    cta: i.cta || '',
+                  };
+                }),
+              },
+              {
+                type: 'team', enabled: true,
+                eyebrow: site.team?.eyebrow || '',
+                title: site.team?.title || '',
+                subtitle: site.team?.subtitle || '',
+                members: (site.team?.members || []).map(function(m) {
+                  return { name: m.name, role: m.role, bio: m.bio, image_url: m.imageUrl };
+                }),
+              },
+              {
+                type: 'reviews', enabled: true,
+                title: site.reviews?.title || '',
+                subtitle: site.reviews?.subtitle || '',
+                items: (site.reviews?.items || []).map(function(r) {
+                  return { name: r.name, stars: r.stars, date: r.date, text: r.text };
+                }),
+              },
+              {
+                type: 'hours', enabled: true,
+                items: (site.hours?.items || []).map(function(h) {
+                  return { day: h.day, time: h.time, open: h.open };
+                }),
+              },
+              {
+                type: 'vergoeding', enabled: true,
+                eyebrow: site.vergoeding?.eyebrow || '',
+                title: site.vergoeding?.title || '',
+                intro: site.vergoeding?.intro || '',
+                blocks: (site.vergoeding?.blocks || []).map(function(b) {
+                  return { title: b.title, text: b.text };
+                }),
+                insurers: (site.vergoeding?.insurers || []).map(function(i) { return i.name; }),
+                cta: site.vergoeding?.cta || '',
+              },
+              {
+                type: 'contact', enabled: true,
+                eyebrow: site.contact?.eyebrow || '',
+                title: site.contact?.title || '',
+                intro: site.contact?.intro || '',
+              },
+            ];
+
+            const frontmatter = JSON.stringify({ title: 'Home', published: true, sections: sections });
+            const homeMd = '---\n' + frontmatter + '\n---\n\n';
+            fs.writeFileSync('dental-template/src/content/pages/home.md', homeMd);
+            console.log('home.md written (' + sections.length + ' sections)');
           }
 
-          main().catch(err => { console.error(err); process.exit(1); });
+          main().catch(function(err) { console.error(err); process.exit(1); });
           "
 
       - name: Build Astro site
