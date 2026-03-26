@@ -58,6 +58,7 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+  // D1 migrations are applied via 'wrangler d1 migrations apply', not bundled in the config
   db: sqliteD1Adapter({
     binding: cloudflare.env.D1,
   }),
