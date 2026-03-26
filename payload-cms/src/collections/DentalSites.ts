@@ -1,9 +1,18 @@
 import type { CollectionConfig } from 'payload'
 
+const isSuperAdmin = ({ req: { user } }: any) => (user as any)?.role === 'super-admin'
+const isLoggedIn = ({ req: { user } }: any) => Boolean(user)
+
 export const DentalSites: CollectionConfig = {
   slug: 'dental-sites',
   admin: {
     useAsTitle: 'practiceName',
+  },
+  access: {
+    create: isSuperAdmin,
+    read: isLoggedIn,   // plugin further filters by tenant for non-admins
+    update: isLoggedIn, // plugin further filters by tenant for non-admins
+    delete: isSuperAdmin,
   },
   fields: [
     {
