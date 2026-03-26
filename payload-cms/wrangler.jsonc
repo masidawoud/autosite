@@ -31,4 +31,8 @@
     // },
   ],
 
+  // GITHUB_TOKEN must be set as a Worker secret (never commit the value):
+  //   cd payload-cms && npx wrangler secret put GITHUB_TOKEN
+  // It is used by the DentalSites afterChange hook to dispatch GitHub Actions builds.
+
 }

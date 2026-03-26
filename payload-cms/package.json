@@ -73,6 +73,9 @@
     "bindings": {
       "PAYLOAD_SECRET": {
         "description": "Generate a random string using `openssl rand -hex 32`"
+      },
+      "GITHUB_TOKEN": {
+        "description": "GitHub PAT with `repo` scope — set via `wrangler secret put GITHUB_TOKEN`. Used by DentalSites afterChange hook to dispatch build-from-payload.yml workflow."
       }
     }
   }

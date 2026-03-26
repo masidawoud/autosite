@@ -1,7 +1,45 @@
 import type { CollectionConfig } from 'payload'
 
+const GITHUB_REPO = 'masidawoud/autosite'
+const WORKFLOW_FILE = 'build-from-payload.yml'
+
 const isSuperAdmin = ({ req: { user } }: any) => (user as any)?.role === 'super-admin'
 const isLoggedIn = ({ req: { user } }: any) => Boolean(user)
+
+async function dispatchBuild(slug: string, cfPagesProject: string): Promise<void> {
+  const token = process.env.GITHUB_TOKEN
+  if (!token) {
+    console.warn('[DentalSites] GITHUB_TOKEN is not set — skipping build dispatch')
+    return
+  }
+
+  const url = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/${WORKFLOW_FILE}/dispatches`
+  const body = JSON.stringify({
+    ref: 'master',
+    inputs: { client_id: slug, cf_project_name: cfPagesProject },
+  })
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      body,
+    })
+    if (res.ok || res.status === 204) {
+      console.log(`[DentalSites] Build dispatched for tenant="${slug}" cf_project="${cfPagesProject}"`)
+    } else {
+      const text = await res.text()
+      console.error(`[DentalSites] GitHub dispatch failed — status=${res.status} body=${text}`)
+    }
+  } catch (err) {
+    console.error('[DentalSites] GitHub dispatch fetch threw:', err)
+  }
+}
 
 export const DentalSites: CollectionConfig = {
   slug: 'dental-sites',
@@ -14,6 +52,45 @@ export const DentalSites: CollectionConfig = {
     read: isLoggedIn,   // plugin further filters by tenant for non-admins
     update: isLoggedIn, // plugin further filters by tenant for non-admins
     delete: isSuperAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ doc, operation, req }) => {
+        if (operation !== 'update') return
+
+        try {
+          // doc.tenant may be a populated object or just an id (number/string)
+          let slug: string | undefined
+          let cfPagesProject: string | undefined
+
+          if (doc.tenant && typeof doc.tenant === 'object') {
+            slug = doc.tenant.slug
+            cfPagesProject = doc.tenant.cfPagesProject
+          } else if (doc.tenant) {
+            // Fetch the tenant record to get slug + cfPagesProject
+            const tenant = await req.payload.findByID({
+              collection: 'tenants',
+              id: doc.tenant,
+            })
+            slug = (tenant as any)?.slug
+            cfPagesProject = (tenant as any)?.cfPagesProject
+          }
+
+          if (!slug || !cfPagesProject) {
+            console.warn('[DentalSites] afterChange: tenant slug or cfPagesProject missing — skipping dispatch', {
+              docId: doc.id,
+              tenant: doc.tenant,
+            })
+            return
+          }
+
+          // Fire-and-forget: do not await so the save response is not blocked
+          void dispatchBuild(slug, cfPagesProject)
+        } catch (err) {
+          console.error('[DentalSites] afterChange hook error:', err)
+        }
+      },
+    ],
   },
   fields: [
     {
