@@ -26,7 +26,9 @@
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.11.0",
+    "@payloadcms/db-d1-sqlite": "3.80.0",
     "@payloadcms/next": "3.80.0",
+    "@payloadcms/plugin-multi-tenant": "^3.80.0",
     "@payloadcms/richtext-lexical": "3.80.0",
     "@payloadcms/storage-r2": "3.80.0",
     "@payloadcms/ui": "3.80.0",
@@ -36,8 +38,7 @@
     "next": "15.4.11",
     "payload": "3.80.0",
     "react": "19.2.1",
-    "react-dom": "19.2.1",
-    "@payloadcms/db-d1-sqlite": "3.80.0"
+    "react-dom": "19.2.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

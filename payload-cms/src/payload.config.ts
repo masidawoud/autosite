@@ -6,17 +6,18 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
 import { GetPlatformProxyOptions } from 'wrangler'
-import { r2Storage } from '@payloadcms/storage-r2'
+import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant'
 
+import { Tenants } from './collections/Tenants'
 import { Users } from './collections/Users'
-import { Media } from './collections/Media'
-import migrations from './db/migrations'
+import { DentalSites } from './collections/DentalSites'
+import type { Config } from './payload-types'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const realpath = (value: string) => (fs.existsSync(value) ? fs.realpathSync(value) : undefined)
 
-const isCLI = process.argv.some((value) => realpath(value).endsWith(path.join('payload', 'bin.js')))
+const isCLI = process.argv.some((value) => realpath(value)?.endsWith(path.join('payload', 'bin.js')))
 const isProduction = process.env.NODE_ENV === 'production'
 
 const createLog =
@@ -51,9 +52,9 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [Tenants, Users, DentalSites],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: process.env.PAYLOAD_SECRET || 'spike-change-in-prod',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
@@ -62,9 +63,15 @@ export default buildConfig({
   }),
   logger: isProduction ? cloudflareLogger : undefined,
   plugins: [
-    r2Storage({
-      bucket: cloudflare.env.R2,
-      collections: { media: true },
+    multiTenantPlugin<Config>({
+      collections: {
+        'dental-sites': {},
+      },
+      tenantsArrayField: {
+        includeDefaultField: true,
+        arrayFieldName: 'tenants',
+      },
+      userHasAccessToAllTenants: (user) => (user as any)?.role === 'super-admin',
     }),
   ],
 })
