@@ -111,12 +111,10 @@ export const DentalSites: CollectionConfig = {
             { name: 'desc', label: 'Description', type: 'textarea' },
             { name: 'imageUrl', label: 'Image URL', type: 'text' },
             {
-              name: 'bullets',
-              label: 'Bullet Points',
-              type: 'array',
-              fields: [
-                { name: 'text', type: 'text' },
-              ],
+              name: 'bulletsJson',
+              label: 'Bullet Points (JSON)',
+              type: 'json',
+              admin: { description: 'JSON array of strings, e.g. ["Bullet 1", "Bullet 2"]' },
             },
             { name: 'cta', label: 'CTA Button', type: 'text' },
           ],
