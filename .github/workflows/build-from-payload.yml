@@ -1,0 +1,119 @@
+name: Build and deploy from Payload CMS
+
+on:
+  workflow_dispatch:
+    inputs:
+      client_id:
+        description: 'Tenant slug (e.g. lie-dental)'
+        required: true
+        type: string
+      cf_project_name:
+        description: 'Cloudflare Pages project name (e.g. dentist-lie-dental)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout autosite repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: dental-template/package-lock.json
+
+      - name: Fetch content from Payload and write site.json
+        env:
+          PAYLOAD_API_URL: ${{ secrets.PAYLOAD_API_URL }}
+          PAYLOAD_API_EMAIL: ${{ secrets.PAYLOAD_API_EMAIL }}
+          PAYLOAD_API_PASSWORD: ${{ secrets.PAYLOAD_API_PASSWORD }}
+        run: |
+          node -e "
+          async function main() {
+            // 1. Login to get a token
+            const loginRes = await fetch(process.env.PAYLOAD_API_URL + '/api/users/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: process.env.PAYLOAD_API_EMAIL,
+                password: process.env.PAYLOAD_API_PASSWORD,
+              }),
+            });
+            const loginData = await loginRes.json();
+            if (!loginRes.ok) {
+              console.error('Login failed:', loginData);
+              process.exit(1);
+            }
+            const token = loginData.token;
+            console.log('Logged in successfully');
+
+            // 2. Fetch the dental site for this tenant
+            const clientId = '${{ inputs.client_id }}';
+            const url = process.env.PAYLOAD_API_URL + '/api/dental-sites?where[tenant.slug][equals]=' + clientId + '&depth=1&limit=1';
+            const siteRes = await fetch(url, {
+              headers: { Authorization: 'Bearer ' + token },
+            });
+            const siteData = await siteRes.json();
+
+            if (!siteData.docs || siteData.docs.length === 0) {
+              console.error('No dental site found for tenant:', clientId);
+              process.exit(1);
+            }
+
+            const site = siteData.docs[0];
+            console.log('Fetched site:', site.practiceName);
+
+            // 3. Map Payload fields to site.json format
+            const siteJson = {
+              business: {
+                name: site.practiceName || '',
+                phone: site.contact?.phone || '',
+                email: site.contact?.email || '',
+              },
+              hero: {
+                eyebrow: '',
+                headline_light: site.hero?.headlineLight || '',
+                headline_heavy: site.hero?.headlineHeavy || '',
+                description: site.hero?.subtext || '',
+                cta_primary: site.hero?.cta || 'Maak een afspraak',
+                cta_secondary: 'Onze diensten',
+                image_url: 'https://picsum.photos/seed/dental-hero/720/860',
+              },
+              services: {
+                eyebrow: 'Diensten',
+                title: 'Alles voor een gezond gebit',
+                subtitle: '',
+                items: (site.services || []).map(s => ({
+                  tag: '',
+                  title: s.name,
+                  desc: s.description || '',
+                  image_url: '',
+                })),
+              },
+            };
+
+            // 4. Write to dental-template
+            require('fs').writeFileSync(
+              'dental-template/src/data/site.json',
+              JSON.stringify(siteJson, null, 2)
+            );
+            console.log('site.json written successfully');
+          }
+
+          main().catch(err => { console.error(err); process.exit(1); });
+          "
+
+      - name: Build Astro site
+        working-directory: dental-template
+        run: npm ci && npm run build
+
+      - name: Deploy to Cloudflare Pages
+        working-directory: dental-template
+        run: npx wrangler@4 pages deploy dist --project-name=${{ inputs.cf_project_name }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
