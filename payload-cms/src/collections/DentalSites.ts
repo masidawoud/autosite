@@ -27,6 +27,7 @@ async function dispatchBuild(slug: string, cfPagesProject: string): Promise<void
         'Content-Type': 'application/json',
         Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
+        'User-Agent': 'autosite-payload-cms',
       },
       body,
     })
@@ -84,8 +85,8 @@ export const DentalSites: CollectionConfig = {
             return
           }
 
-          // Fire-and-forget: do not await so the save response is not blocked
-          void dispatchBuild(slug, cfPagesProject)
+          // Must await — Cloudflare Workers kill pending promises after response is sent
+          await dispatchBuild(slug, cfPagesProject)
         } catch (err) {
           console.error('[DentalSites] afterChange hook error:', err)
         }
