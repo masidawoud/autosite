@@ -5,6 +5,7 @@ const isLoggedIn = ({ req: { user } }: any) => Boolean(user)
 
 export const DentalSites: CollectionConfig = {
   slug: 'dental-sites',
+  lockDocuments: false,
   admin: {
     useAsTitle: 'practiceName',
   },
