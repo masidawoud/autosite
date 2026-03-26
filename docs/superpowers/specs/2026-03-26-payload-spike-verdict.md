@@ -42,11 +42,19 @@ _Date: 2026-03-26_
 
 ### What full migration requires (Phase 1)
 
-- Extend `DentalSites` schema to full 15+ field content model (all current YAML fields)
-- Add `personality` field to Tenants (which Astro variant to render)
-- Update `build-from-payload.yml` to map all fields → `site.json` + `theme.json` + `sections.json`
-- Update `provision-payload.js` to replace the current Gitea 7-step provisioning
-- Add webhook trigger from Payload on content save (instead of manual workflow dispatch)
-- Set `PAYLOAD_SECRET` properly via `wrangler secret put`
-- Custom domain: `cms.foove.nl` pointing to the Workers URL
-- Backup strategy for D1 (Cloudflare point-in-time recovery on paid plan)
+- ✅ Extend `DentalSites` schema to full content model — business, hero, quote, features, services, team, reviews, hours, vergoeding, contact, footer, theme (13 groups, 7 array tables in D1)
+- ✅ Update `build-from-payload.yml` to map all fields → `business.json` + `footer.json` + `theme.json` + `home.md` sections
+- ✅ Add afterChange webhook — Payload save auto-dispatches GitHub Actions build (no manual trigger needed)
+- 🔲 Replace structured form UI with Payload **Blocks** field (page builder UX — drag-and-drop section ordering, add/remove sections) — current structured groups work but don't match the visual CMS experience clients expect
+- 🔲 Update `provision-payload.js` to replace the current Gitea 7-step provisioning with Payload-only flow
+- 🔲 Set `PAYLOAD_SECRET` properly via `wrangler secret put`
+- 🔲 Custom domain: `cms.foove.nl` pointing to the Workers URL
+- 🔲 Backup strategy for D1 (Cloudflare point-in-time recovery on paid plan)
+
+### Known bugs fixed during Phase 1
+
+6. **D1 crashes on PATCH** — Drizzle generates `DELETE FROM payload_locked_documents WHERE false` when releasing empty lock arrays; D1 rejects it. Fixed with `lockDocuments: false` on DentalSites.
+
+7. **afterChange hook silently dropped** — Cloudflare Workers kill pending promises after response is sent; fire-and-forget fetch never executed. Fixed by awaiting the dispatch.
+
+8. **GitHub API 403** — GitHub requires a `User-Agent` header on all API requests. Fixed by adding `User-Agent: autosite-payload-cms`.
