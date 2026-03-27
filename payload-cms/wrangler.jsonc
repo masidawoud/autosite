@@ -21,6 +21,7 @@
       "database_id": "8416fe3b-b595-4b80-b3f0-e85a331d9232",
       "database_name": "autosite-cms",
       "remote": true,
+      "migrations_dir": "src/migrations",
     },
   ],
   "services": [
