@@ -361,4 +361,6 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.run(sql`DROP TABLE IF EXISTS \`site_settings\`;`)
   await db.run(sql`ALTER TABLE \`payload_locked_documents_rels\` DROP COLUMN \`pages_id\`;`)
   await db.run(sql`ALTER TABLE \`payload_locked_documents_rels\` DROP COLUMN \`site_settings_id\`;`)
+  await db.run(sql`ALTER TABLE \`payload_locked_documents_rels\` ADD COLUMN \`dental_sites_id\` integer;`)
+  await db.run(sql`CREATE INDEX IF NOT EXISTS \`payload_locked_documents_rels_dental_sites_id_idx\` ON \`payload_locked_documents_rels\` (\`dental_sites_id\`);`)
 }
