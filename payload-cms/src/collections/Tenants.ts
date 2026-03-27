@@ -1,12 +1,19 @@
 import type { CollectionConfig } from 'payload'
 
+const isSuperAdmin = ({ req: { user } }: { req: { user: any } }) =>
+  (user as any)?.role === 'super-admin'
+
 export const Tenants: CollectionConfig = {
   slug: 'tenants',
   admin: {
     useAsTitle: 'name',
+    hidden: ({ user }) => (user as any)?.role !== 'super-admin',
   },
   access: {
-    read: () => true,
+    read: isSuperAdmin,
+    create: isSuperAdmin,
+    update: isSuperAdmin,
+    delete: isSuperAdmin,
   },
   fields: [
     {
