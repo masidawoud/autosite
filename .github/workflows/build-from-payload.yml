@@ -119,89 +119,209 @@ jobs:
             console.log('theme.json written (preset: ' + stylePreset + ')');
 
             // 6. Build sections array for home.md
-            const sections = [
-              {
-                type: 'hero', enabled: true,
-                eyebrow: site.hero?.eyebrow || '',
-                headline: site.hero?.headline || '',
-                description: site.hero?.description || '',
-                cta_primary: site.hero?.ctaPrimary || 'Maak een afspraak',
-                cta_secondary: site.hero?.ctaSecondary || 'Bel ons',
-                image_url: site.hero?.imageUrl || 'https://picsum.photos/seed/dental-hero/720/860',
-              },
-              {
-                type: 'quote', enabled: true,
-                text: site.quote?.text || '',
-                author_name: site.quote?.authorName || '',
-                author_role: site.quote?.authorRole || '',
-              },
-              {
-                type: 'features', enabled: true,
-                eyebrow: site.features?.eyebrow || '',
-                title: site.features?.title || '',
-                subtitle: site.features?.subtitle || '',
-                image_url: site.features?.imageUrl || '',
-                items: (site.features?.items || []).map(function(i) {
-                  return { icon: i.icon, title: i.title, desc: i.desc };
-                }),
-              },
-              {
-                type: 'services', enabled: true,
-                eyebrow: site.services?.eyebrow || '',
-                title: site.services?.title || '',
-                subtitle: site.services?.subtitle || '',
-                items: (site.services?.items || []).map(function(i) {
-                  return {
-                    tag: i.tag || '',
-                    title: i.title || '',
-                    desc: i.desc || '',
-                    image_url: i.imageUrl || '',
-                    items: Array.isArray(i.bulletsJson) ? i.bulletsJson : [],
-                    cta: i.cta || '',
-                  };
-                }),
-              },
-              {
-                type: 'team', enabled: true,
-                eyebrow: site.team?.eyebrow || '',
-                title: site.team?.title || '',
-                subtitle: site.team?.subtitle || '',
-                members: (site.team?.members || []).map(function(m) {
-                  return { name: m.name, role: m.role, bio: m.bio, image_url: m.imageUrl };
-                }),
-              },
-              {
-                type: 'reviews', enabled: true,
-                title: site.reviews?.title || '',
-                subtitle: site.reviews?.subtitle || '',
-                items: (site.reviews?.items || []).map(function(r) {
-                  return { name: r.name, stars: r.stars, date: r.date, text: r.text };
-                }),
-              },
-              {
-                type: 'hours', enabled: true,
-                items: (site.hours?.items || []).map(function(h) {
-                  return { day: h.day, time: h.time, open: h.open };
-                }),
-              },
-              {
-                type: 'vergoeding', enabled: true,
-                eyebrow: site.vergoeding?.eyebrow || '',
-                title: site.vergoeding?.title || '',
-                intro: site.vergoeding?.intro || '',
-                blocks: (site.vergoeding?.blocks || []).map(function(b) {
-                  return { title: b.title, text: b.text };
-                }),
-                insurers: (site.vergoeding?.insurers || []).map(function(i) { return i.name; }),
-                cta: site.vergoeding?.cta || '',
-              },
-              {
-                type: 'contact', enabled: true,
-                eyebrow: site.contact?.eyebrow || '',
-                title: site.contact?.title || '',
-                intro: site.contact?.intro || '',
-              },
-            ];
+            function lexicalToText(editorState) {
+              if (!editorState || !editorState.root) return '';
+              function walk(node) {
+                if (node.type === 'text') return node.text || '';
+                if (node.children) return node.children.map(walk).join(' ');
+                return '';
+              }
+              return walk(editorState.root).replace(/\s+/g, ' ').trim();
+            }
+
+            var sections;
+
+            if (site.sections && site.sections.length > 0) {
+              // ── Blocks path: use new page-builder data ─────────────────────
+              sections = site.sections.map(function(block) {
+                switch (block.blockType) {
+                  case 'hero':
+                    return {
+                      type: 'hero', enabled: true,
+                      eyebrow: block.eyebrow || '',
+                      headline: block.headline || '',
+                      description: lexicalToText(block.description),
+                      cta_primary: block.ctaPrimary || 'Maak een afspraak',
+                      cta_secondary: block.ctaSecondary || 'Bel ons',
+                      image_url: block.imageUrl || 'https://picsum.photos/seed/dental-hero/720/860',
+                    };
+                  case 'quote':
+                    return {
+                      type: 'quote', enabled: true,
+                      text: block.text || '',
+                      author_name: block.authorName || '',
+                      author_role: block.authorRole || '',
+                    };
+                  case 'features':
+                    return {
+                      type: 'features', enabled: true,
+                      eyebrow: block.eyebrow || '',
+                      title: block.title || '',
+                      subtitle: block.subtitle || '',
+                      image_url: block.imageUrl || '',
+                      items: (block.items || []).map(function(i) {
+                        return { icon: i.icon || '', title: i.title || '', desc: i.desc || '' };
+                      }),
+                    };
+                  case 'services':
+                    return {
+                      type: 'services', enabled: true,
+                      eyebrow: block.eyebrow || '',
+                      title: block.title || '',
+                      subtitle: block.subtitle || '',
+                      items: (block.items || []).map(function(i) {
+                        return {
+                          tag: i.tag || '',
+                          title: i.title || '',
+                          desc: i.desc || '',
+                          image_url: i.imageUrl || '',
+                          items: (i.bullets || []).map(function(b) { return b.text || ''; }),
+                          cta: i.cta || '',
+                        };
+                      }),
+                    };
+                  case 'team':
+                    return {
+                      type: 'team', enabled: true,
+                      eyebrow: block.eyebrow || '',
+                      title: block.title || '',
+                      subtitle: block.subtitle || '',
+                      members: (block.members || []).map(function(m) {
+                        return {
+                          name: m.name || '',
+                          role: m.role || '',
+                          bio: lexicalToText(m.bio),
+                          image_url: m.imageUrl || '',
+                        };
+                      }),
+                    };
+                  case 'reviews':
+                    return {
+                      type: 'reviews', enabled: true,
+                      title: block.title || '',
+                      subtitle: block.subtitle || '',
+                      items: (block.items || []).map(function(r) {
+                        return { name: r.name || '', stars: r.stars || 0, date: r.date || '', text: r.text || '' };
+                      }),
+                    };
+                  case 'hours':
+                    return {
+                      type: 'hours', enabled: true,
+                      items: (block.items || []).map(function(h) {
+                        return { day: h.day || '', time: h.time || '', open: h.open !== false };
+                      }),
+                    };
+                  case 'vergoeding':
+                    return {
+                      type: 'vergoeding', enabled: true,
+                      eyebrow: block.eyebrow || '',
+                      title: block.title || '',
+                      intro: lexicalToText(block.intro),
+                      blocks: (block.infoBlocks || []).map(function(b) {
+                        return { title: b.title || '', text: b.text || '' };
+                      }),
+                      insurers: (block.insurers || []).map(function(i) { return i.name || ''; }),
+                      cta: block.cta || '',
+                    };
+                  case 'contact':
+                    return {
+                      type: 'contact', enabled: true,
+                      eyebrow: block.eyebrow || '',
+                      title: block.title || '',
+                      intro: lexicalToText(block.intro),
+                    };
+                  default:
+                    console.warn('Unknown blockType: ' + block.blockType + ' — skipping');
+                    return null;
+                }
+              }).filter(function(s) { return s !== null; });
+
+            } else {
+              // ── Legacy path: fall back to flat field groups ────────────────
+              sections = [
+                {
+                  type: 'hero', enabled: true,
+                  eyebrow: site.hero?.eyebrow || '',
+                  headline: site.hero?.headline || '',
+                  description: site.hero?.description || '',
+                  cta_primary: site.hero?.ctaPrimary || 'Maak een afspraak',
+                  cta_secondary: site.hero?.ctaSecondary || 'Bel ons',
+                  image_url: site.hero?.imageUrl || 'https://picsum.photos/seed/dental-hero/720/860',
+                },
+                {
+                  type: 'quote', enabled: true,
+                  text: site.quote?.text || '',
+                  author_name: site.quote?.authorName || '',
+                  author_role: site.quote?.authorRole || '',
+                },
+                {
+                  type: 'features', enabled: true,
+                  eyebrow: site.features?.eyebrow || '',
+                  title: site.features?.title || '',
+                  subtitle: site.features?.subtitle || '',
+                  image_url: site.features?.imageUrl || '',
+                  items: (site.features?.items || []).map(function(i) {
+                    return { icon: i.icon, title: i.title, desc: i.desc };
+                  }),
+                },
+                {
+                  type: 'services', enabled: true,
+                  eyebrow: site.services?.eyebrow || '',
+                  title: site.services?.title || '',
+                  subtitle: site.services?.subtitle || '',
+                  items: (site.services?.items || []).map(function(i) {
+                    return {
+                      tag: i.tag || '',
+                      title: i.title || '',
+                      desc: i.desc || '',
+                      image_url: i.imageUrl || '',
+                      items: Array.isArray(i.bulletsJson) ? i.bulletsJson : [],
+                      cta: i.cta || '',
+                    };
+                  }),
+                },
+                {
+                  type: 'team', enabled: true,
+                  eyebrow: site.team?.eyebrow || '',
+                  title: site.team?.title || '',
+                  subtitle: site.team?.subtitle || '',
+                  members: (site.team?.members || []).map(function(m) {
+                    return { name: m.name || '', role: m.role || '', bio: m.bio || '', image_url: m.imageUrl || '' };
+                  }),
+                },
+                {
+                  type: 'reviews', enabled: true,
+                  title: site.reviews?.title || '',
+                  subtitle: site.reviews?.subtitle || '',
+                  items: (site.reviews?.items || []).map(function(r) {
+                    return { name: r.name || '', stars: r.stars || 0, date: r.date || '', text: r.text || '' };
+                  }),
+                },
+                {
+                  type: 'hours', enabled: true,
+                  items: (site.hours?.items || []).map(function(h) {
+                    return { day: h.day || '', time: h.time || '', open: h.open !== false };
+                  }),
+                },
+                {
+                  type: 'vergoeding', enabled: true,
+                  eyebrow: site.vergoeding?.eyebrow || '',
+                  title: site.vergoeding?.title || '',
+                  intro: site.vergoeding?.intro || '',
+                  blocks: (site.vergoeding?.blocks || []).map(function(b) {
+                    return { title: b.title, text: b.text };
+                  }),
+                  insurers: (site.vergoeding?.insurers || []).map(function(i) { return i.name; }),
+                  cta: site.vergoeding?.cta || '',
+                },
+                {
+                  type: 'contact', enabled: true,
+                  eyebrow: site.contact?.eyebrow || '',
+                  title: site.contact?.title || '',
+                  intro: site.contact?.intro || '',
+                },
+              ];
+            }
 
             const frontmatter = JSON.stringify({ title: 'Home', published: true, sections: sections });
             const homeMd = '---\n' + frontmatter + '\n---\n\n';
@@ -218,7 +338,7 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         working-directory: dental-template
-        run: npx wrangler@4 pages deploy dist --project-name=${{ inputs.cf_project_name }}
+        run: npx wrangler@4 pages deploy dist --project-name=${{ inputs.cf_project_name }} --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
