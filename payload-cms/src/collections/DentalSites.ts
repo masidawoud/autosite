@@ -72,6 +72,7 @@ export const DentalSites: CollectionConfig = {
             const tenant = await req.payload.findByID({
               collection: 'tenants',
               id: doc.tenant,
+              overrideAccess: true,
             })
             slug = (tenant as any)?.slug
             cfPagesProject = (tenant as any)?.cfPagesProject
