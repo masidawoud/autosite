@@ -10,7 +10,8 @@ import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant'
 
 import { Tenants } from './collections/Tenants'
 import { Users } from './collections/Users'
-import { DentalSites } from './collections/DentalSites'
+import { Pages } from './collections/Pages'
+import { SiteSettings } from './collections/SiteSettings'
 import type { Config } from './payload-types'
 
 const filename = fileURLToPath(import.meta.url)
@@ -38,7 +39,7 @@ const cloudflareLogger = {
   error: createLog('error', console.error),
   fatal: createLog('fatal', console.error),
   silent: () => {},
-} as any // Use PayloadLogger type when it's exported
+} as any
 
 const cloudflare =
   isCLI || !isProduction
@@ -48,17 +49,16 @@ const cloudflare =
 export default buildConfig({
   admin: {
     user: Users.slug,
-importMap: {
+    importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Tenants, Users, DentalSites],
+  collections: [Tenants, Users, Pages, SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'spike-change-in-prod',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // D1 migrations are applied via 'wrangler d1 migrations apply', not bundled in the config
   db: sqliteD1Adapter({
     binding: cloudflare.env.D1,
   }),
@@ -66,7 +66,8 @@ importMap: {
   plugins: [
     multiTenantPlugin<Config>({
       collections: {
-        'dental-sites': {},
+        'pages': {},
+        'site-settings': {},
       },
       tenantsArrayField: {
         includeDefaultField: true,
@@ -77,7 +78,6 @@ importMap: {
   ],
 })
 
-// Adapted from https://github.com/opennextjs/opennextjs-cloudflare/blob/d00b3a13e42e65aad76fba41774815726422cc39/packages/cloudflare/src/api/cloudflare-context.ts#L328C36-L328C46
 function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
   return import(/* webpackIgnore: true */ `${'__wrangler'.replaceAll('_', '')}`).then(
     ({ getPlatformProxy }) =>

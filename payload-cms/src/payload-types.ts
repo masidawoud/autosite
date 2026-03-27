@@ -69,7 +69,8 @@ export interface Config {
   collections: {
     tenants: Tenant;
     users: User;
-    'dental-sites': DentalSite;
+    pages: Page;
+    'site-settings': SiteSetting;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -79,7 +80,8 @@ export interface Config {
   collectionsSelect: {
     tenants: TenantsSelect<false> | TenantsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    'dental-sites': DentalSitesSelect<false> | DentalSitesSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -171,30 +173,47 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "dental-sites".
+ * via the `definition` "pages".
  */
-export interface DentalSite {
+export interface Page {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  title: string;
+  slug: string;
+  layout?: unknown[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
   id: number;
   tenant?: (number | null) | Tenant;
   practiceName: string;
-  hero?: {
-    headlineLight?: string | null;
-    headlineHeavy?: string | null;
-    subtext?: string | null;
-    cta?: string | null;
+  business?: {
+    city?: string | null;
+    address?: string | null;
+    postalCode?: string | null;
+    googleReviewsScore?: string | null;
+    googleReviewsCount?: number | null;
+    googleReviewsUrl?: string | null;
   };
   contact?: {
     phone?: string | null;
     email?: string | null;
-    hours?: string | null;
   };
-  services?:
-    | {
-        name: string;
-        description?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  theme?: {
+    stylePreset?: ('warm-editorial' | 'ocean-depths' | 'tech-innovation') | null;
+    accentColor?: string | null;
+    accentHoverColor?: string | null;
+  };
+  footer?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    tagline?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -231,8 +250,12 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
-        relationTo: 'dental-sites';
-        value: number | DentalSite;
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'site-settings';
+        value: number | SiteSetting;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -318,32 +341,52 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "dental-sites_select".
+ * via the `definition` "pages_select".
  */
-export interface DentalSitesSelect<T extends boolean = true> {
+export interface PagesSelect<T extends boolean = true> {
+  tenant?: T;
+  title?: T;
+  slug?: T;
+  layout?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
   tenant?: T;
   practiceName?: T;
-  hero?:
+  business?:
     | T
     | {
-        headlineLight?: T;
-        headlineHeavy?: T;
-        subtext?: T;
-        cta?: T;
+        city?: T;
+        address?: T;
+        postalCode?: T;
+        googleReviewsScore?: T;
+        googleReviewsCount?: T;
+        googleReviewsUrl?: T;
       };
   contact?:
     | T
     | {
         phone?: T;
         email?: T;
-        hours?: T;
       };
-  services?:
+  theme?:
     | T
     | {
-        name?: T;
-        description?: T;
-        id?: T;
+        stylePreset?: T;
+        accentColor?: T;
+        accentHoverColor?: T;
+      };
+  footer?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        tagline?: T;
       };
   updatedAt?: T;
   createdAt?: T;
