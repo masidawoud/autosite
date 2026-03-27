@@ -286,7 +286,7 @@ jobs:
                   title: site.team?.title || '',
                   subtitle: site.team?.subtitle || '',
                   members: (site.team?.members || []).map(function(m) {
-                    return { name: m.name, role: m.role, bio: m.bio, image_url: m.imageUrl };
+                    return { name: m.name || '', role: m.role || '', bio: m.bio || '', image_url: m.imageUrl || '' };
                   }),
                 },
                 {
@@ -294,13 +294,13 @@ jobs:
                   title: site.reviews?.title || '',
                   subtitle: site.reviews?.subtitle || '',
                   items: (site.reviews?.items || []).map(function(r) {
-                    return { name: r.name, stars: r.stars, date: r.date, text: r.text };
+                    return { name: r.name || '', stars: r.stars || 0, date: r.date || '', text: r.text || '' };
                   }),
                 },
                 {
                   type: 'hours', enabled: true,
                   items: (site.hours?.items || []).map(function(h) {
-                    return { day: h.day, time: h.time, open: h.open };
+                    return { day: h.day || '', time: h.time || '', open: h.open !== false };
                   }),
                 },
                 {
