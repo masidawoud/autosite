@@ -3,6 +3,12 @@ import type { CollectionConfig } from 'payload'
 const isSuperAdmin = ({ req: { user } }: { req: { user: any } }) =>
   (user as any)?.role === 'super-admin'
 
+// Read must stay open for logged-in users — the multiTenantPlugin fetches the
+// Tenants collection internally to build the tenant switcher UI. Blocking read
+// entirely crashes the admin panel for client users. Nav visibility is handled
+// by admin.hidden below.
+const isLoggedIn = ({ req: { user } }: { req: { user: any } }) => Boolean(user)
+
 export const Tenants: CollectionConfig = {
   slug: 'tenants',
   admin: {
@@ -10,7 +16,7 @@ export const Tenants: CollectionConfig = {
     hidden: ({ user }) => (user as any)?.role !== 'super-admin',
   },
   access: {
-    read: isSuperAdmin,
+    read: isLoggedIn,
     create: isSuperAdmin,
     update: isSuperAdmin,
     delete: isSuperAdmin,
