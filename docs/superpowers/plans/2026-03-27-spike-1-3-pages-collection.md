@@ -795,7 +795,18 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.run(sql`ALTER TABLE \`payload_locked_documents_rels\` ADD COLUMN \`site_settings_id\` integer;`)
   await db.run(sql`CREATE INDEX IF NOT EXISTS \`payload_locked_documents_rels_site_settings_id_idx\` ON \`payload_locked_documents_rels\` (\`site_settings_id\`);`)
 
-  // ── 5. Drop dental_sites_blocks_* tables (deepest first) ───────────────────
+  // ── 5. Drop orphaned flat-schema array tables (from 20260326_120000 migration) ─
+  // These were created by the original full-schema migration and were never cleaned up.
+  // Must be dropped before dental_sites (they reference it via _parent_id).
+  await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_vergoeding_insurers\`;`)
+  await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_vergoeding_blocks\`;`)
+  await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_hours_items\`;`)
+  await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_reviews_items\`;`)
+  await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_team_members\`;`)
+  await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_services_items\`;`)
+  await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_features_items\`;`)
+
+  // ── 6. Drop dental_sites_blocks_* tables (deepest first) ───────────────────
   await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_blocks_services_items_bullets\`;`)
   await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_blocks_services_items\`;`)
   await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_blocks_services\`;`)
@@ -814,10 +825,10 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_blocks_quote\`;`)
   await db.run(sql`DROP TABLE IF EXISTS \`dental_sites_blocks_hero\`;`)
 
-  // ── 6. Drop dental_sites table ──────────────────────────────────────────────
+  // ── 7. Drop dental_sites table ──────────────────────────────────────────────
   await db.run(sql`DROP TABLE IF EXISTS \`dental_sites\`;`)
 
-  // ── 7. Drop dental_sites_id from payload_locked_documents_rels ─────────────
+  // ── 8. Drop dental_sites_id from payload_locked_documents_rels ─────────────
   await db.run(sql`ALTER TABLE \`payload_locked_documents_rels\` DROP COLUMN \`dental_sites_id\`;`)
 }
 
@@ -1302,6 +1313,8 @@ No code changes. The spike is complete. Update `docs/superpowers/plans/2026-03-2
 - ✅ E2E verification
 
 **Placeholder scan:** No TBD, no "implement later", all code steps show complete code.
+
+**Independent review finding (fixed):** Migration now drops 7 orphaned flat-schema array tables from the `20260326_120000` migration era (`dental_sites_features_items`, `dental_sites_services_items`, `dental_sites_team_members`, `dental_sites_reviews_items`, `dental_sites_hours_items`, `dental_sites_vergoeding_blocks`, `dental_sites_vergoeding_insurers`) before dropping `dental_sites`. Original plan omitted these.
 
 **Type consistency:**
 - `dispatchBuildForDoc` defined in Task 1, imported in Tasks 2 and 3 ✅
