@@ -338,7 +338,7 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         working-directory: dental-template
-        run: npx wrangler@4 pages deploy dist --project-name=${{ inputs.cf_project_name }}
+        run: npx wrangler@4 pages deploy dist --project-name=${{ inputs.cf_project_name }} --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
