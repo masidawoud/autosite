@@ -1,4 +1,13 @@
 import type { CollectionConfig } from 'payload'
+import { HeroBlock } from '../blocks/HeroBlock'
+import { QuoteBlock } from '../blocks/QuoteBlock'
+import { FeaturesBlock } from '../blocks/FeaturesBlock'
+import { ServicesBlock } from '../blocks/ServicesBlock'
+import { TeamBlock } from '../blocks/TeamBlock'
+import { ReviewsBlock } from '../blocks/ReviewsBlock'
+import { HoursBlock } from '../blocks/HoursBlock'
+import { VergoedingBlock } from '../blocks/VergoedingBlock'
+import { ContactBlock } from '../blocks/ContactBlock'
 
 const GITHUB_REPO = 'masidawoud/autosite'
 const WORKFLOW_FILE = 'build-from-payload.yml'
@@ -96,240 +105,109 @@ export const DentalSites: CollectionConfig = {
   },
   fields: [
     {
-      name: 'practiceName',
-      label: 'Practice Name',
-      type: 'text',
-      required: true,
-    },
-
-    // ── Business info ──────────────────────────────────────────────────────────
-    {
-      name: 'business',
-      type: 'group',
-      fields: [
-        { name: 'city', type: 'text' },
-        { name: 'address', type: 'text' },
-        { name: 'postalCode', label: 'Postal Code', type: 'text' },
-        { name: 'googleReviewsScore', label: 'Google Reviews Score', type: 'text' },
-        { name: 'googleReviewsCount', label: 'Google Reviews Count', type: 'number' },
-        { name: 'googleReviewsUrl', label: 'Google Reviews URL', type: 'text' },
-      ],
-    },
-
-    // ── Hero ──────────────────────────────────────────────────────────────────
-    {
-      name: 'hero',
-      type: 'group',
-      fields: [
-        { name: 'eyebrow', type: 'text' },
-        { name: 'headline', type: 'text' },
-        { name: 'description', type: 'textarea' },
-        { name: 'ctaPrimary', label: 'CTA Primary', type: 'text', defaultValue: 'Maak een afspraak' },
-        { name: 'ctaSecondary', label: 'CTA Secondary', type: 'text', defaultValue: 'Bel ons' },
-        { name: 'imageUrl', label: 'Image URL', type: 'text' },
-      ],
-    },
-
-    // ── Quote ─────────────────────────────────────────────────────────────────
-    {
-      name: 'quote',
-      type: 'group',
-      fields: [
-        { name: 'text', type: 'textarea' },
-        { name: 'authorName', label: 'Author Name', type: 'text' },
-        { name: 'authorRole', label: 'Author Role', type: 'text' },
-      ],
-    },
-
-    // ── Features ──────────────────────────────────────────────────────────────
-    {
-      name: 'features',
-      type: 'group',
-      fields: [
-        { name: 'eyebrow', type: 'text' },
-        { name: 'title', type: 'text' },
-        { name: 'subtitle', type: 'text' },
-        { name: 'imageUrl', label: 'Image URL', type: 'text' },
+      type: 'tabs',
+      tabs: [
+        // ── Tab 1: Pagina-inhoud ─────────────────────────────────────────────
         {
-          name: 'items',
-          type: 'array',
+          label: 'Pagina-inhoud',
           fields: [
             {
-              name: 'icon',
-              type: 'select',
-              options: [
-                { label: 'Shield', value: 'shield' },
-                { label: 'Clock', value: 'clock' },
-                { label: 'Team', value: 'team' },
-                { label: 'Tech', value: 'tech' },
-                { label: 'Heart', value: 'heart' },
-                { label: 'Card', value: 'card' },
+              name: 'sections',
+              label: 'Secties',
+              type: 'blocks',
+              minRows: 0,
+              maxRows: 20,
+              blocks: [
+                HeroBlock,
+                QuoteBlock,
+                FeaturesBlock,
+                ServicesBlock,
+                TeamBlock,
+                ReviewsBlock,
+                HoursBlock,
+                VergoedingBlock,
+                ContactBlock,
               ],
             },
-            { name: 'title', type: 'text' },
-            { name: 'desc', label: 'Description', type: 'textarea' },
           ],
         },
-      ],
-    },
 
-    // ── Services ──────────────────────────────────────────────────────────────
-    {
-      name: 'services',
-      type: 'group',
-      fields: [
-        { name: 'eyebrow', type: 'text' },
-        { name: 'title', type: 'text' },
-        { name: 'subtitle', type: 'text' },
+        // ── Tab 2: Bedrijfsgegevens ──────────────────────────────────────────
         {
-          name: 'items',
-          type: 'array',
+          label: 'Bedrijfsgegevens',
           fields: [
-            { name: 'tag', type: 'text' },
-            { name: 'title', type: 'text' },
-            { name: 'desc', label: 'Description', type: 'textarea' },
-            { name: 'imageUrl', label: 'Image URL', type: 'text' },
             {
-              name: 'bulletsJson',
-              label: 'Bullet Points (JSON)',
-              type: 'json',
-              admin: { description: 'JSON array of strings, e.g. ["Bullet 1", "Bullet 2"]' },
+              name: 'practiceName',
+              label: 'Practice Name',
+              type: 'text',
+              required: true,
             },
-            { name: 'cta', label: 'CTA Button', type: 'text' },
+            {
+              name: 'business',
+              type: 'group',
+              fields: [
+                { name: 'city', type: 'text' },
+                { name: 'address', type: 'text' },
+                { name: 'postalCode', label: 'Postal Code', type: 'text' },
+                { name: 'googleReviewsScore', label: 'Google Reviews Score', type: 'text' },
+                { name: 'googleReviewsCount', label: 'Google Reviews Count', type: 'number' },
+                { name: 'googleReviewsUrl', label: 'Google Reviews URL', type: 'text' },
+              ],
+            },
+            {
+              name: 'contact',
+              type: 'group',
+              fields: [
+                { name: 'eyebrow', type: 'text' },
+                { name: 'title', type: 'text' },
+                { name: 'intro', type: 'textarea' },
+                { name: 'phone', type: 'text' },
+                { name: 'email', type: 'email' },
+              ],
+            },
           ],
         },
-      ],
-    },
 
-    // ── Team ──────────────────────────────────────────────────────────────────
-    {
-      name: 'team',
-      type: 'group',
-      fields: [
-        { name: 'eyebrow', type: 'text' },
-        { name: 'title', type: 'text' },
-        { name: 'subtitle', type: 'text' },
+        // ── Tab 3: Thema ─────────────────────────────────────────────────────
         {
-          name: 'members',
-          type: 'array',
+          label: 'Thema',
           fields: [
-            { name: 'name', type: 'text' },
-            { name: 'role', type: 'text' },
-            { name: 'bio', type: 'textarea' },
-            { name: 'imageUrl', label: 'Image URL', type: 'text' },
+            {
+              name: 'theme',
+              type: 'group',
+              fields: [
+                {
+                  name: 'stylePreset',
+                  label: 'Style Preset',
+                  type: 'select',
+                  options: [
+                    { label: 'Warm Editorial', value: 'warm-editorial' },
+                    { label: 'Ocean Depths', value: 'ocean-depths' },
+                    { label: 'Tech Innovation', value: 'tech-innovation' },
+                  ],
+                },
+                { name: 'accentColor', label: 'Accent Color (hex)', type: 'text', admin: { placeholder: '#2D7A6C' } },
+                { name: 'accentHoverColor', label: 'Accent Hover Color (hex)', type: 'text' },
+              ],
+            },
           ],
         },
-      ],
-    },
 
-    // ── Reviews ───────────────────────────────────────────────────────────────
-    {
-      name: 'reviews',
-      type: 'group',
-      fields: [
-        { name: 'title', type: 'text' },
-        { name: 'subtitle', type: 'text' },
+        // ── Tab 4: SEO & Footer ──────────────────────────────────────────────
         {
-          name: 'items',
-          type: 'array',
+          label: 'SEO & Footer',
           fields: [
-            { name: 'name', type: 'text' },
-            { name: 'stars', type: 'number' },
-            { name: 'date', type: 'text' },
-            { name: 'text', type: 'textarea' },
+            {
+              name: 'footer',
+              type: 'group',
+              fields: [
+                { name: 'metaTitle', label: 'Meta Title', type: 'text' },
+                { name: 'metaDescription', label: 'Meta Description', type: 'textarea' },
+                { name: 'tagline', type: 'text' },
+              ],
+            },
           ],
         },
-      ],
-    },
-
-    // ── Opening hours ─────────────────────────────────────────────────────────
-    {
-      name: 'hours',
-      label: 'Opening Hours',
-      type: 'group',
-      fields: [
-        {
-          name: 'items',
-          type: 'array',
-          fields: [
-            { name: 'day', type: 'text' },
-            { name: 'time', type: 'text' },
-            { name: 'open', type: 'checkbox', defaultValue: true },
-          ],
-        },
-      ],
-    },
-
-    // ── Vergoeding ────────────────────────────────────────────────────────────
-    {
-      name: 'vergoeding',
-      label: 'Vergoeding (Insurance)',
-      type: 'group',
-      fields: [
-        { name: 'eyebrow', type: 'text' },
-        { name: 'title', type: 'text' },
-        { name: 'intro', type: 'textarea' },
-        {
-          name: 'blocks',
-          type: 'array',
-          fields: [
-            { name: 'title', type: 'text' },
-            { name: 'text', type: 'textarea' },
-          ],
-        },
-        {
-          name: 'insurers',
-          label: 'Insurer Names',
-          type: 'array',
-          fields: [
-            { name: 'name', type: 'text' },
-          ],
-        },
-        { name: 'cta', label: 'CTA Button', type: 'text' },
-      ],
-    },
-
-    // ── Contact ───────────────────────────────────────────────────────────────
-    {
-      name: 'contact',
-      type: 'group',
-      fields: [
-        { name: 'eyebrow', type: 'text' },
-        { name: 'title', type: 'text' },
-        { name: 'intro', type: 'textarea' },
-        { name: 'phone', type: 'text' },
-        { name: 'email', type: 'email' },
-      ],
-    },
-
-    // ── Footer / SEO ──────────────────────────────────────────────────────────
-    {
-      name: 'footer',
-      type: 'group',
-      fields: [
-        { name: 'metaTitle', label: 'Meta Title', type: 'text' },
-        { name: 'metaDescription', label: 'Meta Description', type: 'textarea' },
-        { name: 'tagline', type: 'text' },
-      ],
-    },
-
-    // ── Theme ─────────────────────────────────────────────────────────────────
-    {
-      name: 'theme',
-      type: 'group',
-      fields: [
-        {
-          name: 'stylePreset',
-          label: 'Style Preset',
-          type: 'select',
-          options: [
-            { label: 'Warm Editorial', value: 'warm-editorial' },
-            { label: 'Ocean Depths', value: 'ocean-depths' },
-            { label: 'Tech Innovation', value: 'tech-innovation' },
-          ],
-        },
-        { name: 'accentColor', label: 'Accent Color (hex)', type: 'text', admin: { placeholder: '#2D7A6C' } },
-        { name: 'accentHoverColor', label: 'Accent Hover Color (hex)', type: 'text' },
       ],
     },
   ],
