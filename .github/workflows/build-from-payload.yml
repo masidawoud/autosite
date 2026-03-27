@@ -68,7 +68,7 @@ jobs:
             const token = loginData.token;
             console.log('Logged in successfully');
 
-            const clientId = '${{ inputs.client_id }}';
+            const clientId = encodeURIComponent('${{ inputs.client_id }}');
             const authHeader = { Authorization: 'Bearer ' + token };
 
             // 2. Fetch SiteSettings for this tenant
@@ -76,6 +76,7 @@ jobs:
               process.env.PAYLOAD_API_URL + '/api/site-settings?where[tenant.slug][equals]=' + clientId + '&depth=1&limit=1',
               { headers: authHeader }
             );
+            if (!settingsRes.ok) { console.error('site-settings fetch failed — HTTP ' + settingsRes.status); process.exit(1); }
             const settingsData = await settingsRes.json();
             if (!settingsData.docs || settingsData.docs.length === 0) {
               console.error('No site-settings found for tenant:', clientId);
@@ -128,6 +129,7 @@ jobs:
               process.env.PAYLOAD_API_URL + '/api/pages?where[and][0][tenant.slug][equals]=' + clientId + '&where[and][1][slug][equals]=home&depth=2&limit=1',
               { headers: authHeader }
             );
+            if (!pageRes.ok) { console.error('pages fetch failed — HTTP ' + pageRes.status); process.exit(1); }
             const pageData = await pageRes.json();
             if (!pageData.docs || pageData.docs.length === 0) {
               console.error('No home page found for tenant:', clientId);
