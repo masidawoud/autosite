@@ -48,6 +48,7 @@ const cloudflare =
 export default buildConfig({
   admin: {
     user: Users.slug,
+    defaultRoute: '/collections/dental-sites',
     importMap: {
       baseDir: path.resolve(dirname),
     },
