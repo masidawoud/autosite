@@ -5,6 +5,7 @@ export const Users: CollectionConfig = {
   auth: true,
   admin: {
     useAsTitle: 'email',
+    hidden: ({ user }) => (user as any)?.role !== 'super-admin',
   },
   fields: [
     {
@@ -12,6 +13,7 @@ export const Users: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'user',
+      saveToJWT: true,
       options: [
         { label: 'Super Admin (Operator)', value: 'super-admin' },
         { label: 'Client', value: 'user' },
